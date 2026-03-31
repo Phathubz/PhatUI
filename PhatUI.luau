@@ -21,8 +21,6 @@ local EASING_STYLES = {
     Quad = Enum.EasingStyle.Quad,
     Cubic = Enum.EasingStyle.Cubic,
     Quint = Enum.EasingStyle.Quint,
-    Expo = Enum.EasingStyle.Expo,
-    Circ = Enum.EasingStyle.Circ,
     Back = Enum.EasingStyle.Back,
     Bounce = Enum.EasingStyle.Bounce,
     Elastic = Enum.EasingStyle.Elastic,
@@ -163,7 +161,7 @@ function Aurora:CreateWindow(config)
         Size = Config.Size,
         Position = Config.Position,
         AnchorPoint = Vector2.new(0.5, 0.5),
-        BackgroundColor3 = Config.Theme.Dark,
+    BackgroundColor3 = Config.Theme.Dark,
         BorderSizePixel = 0,
         Parent = ScreenGui,
         ZIndex = 2,
@@ -190,7 +188,7 @@ function Aurora:CreateWindow(config)
     local TopBar = Utility:Create("Frame", {
         Name = "TopBar",
         Size = UDim2.new(1, 0, 0, 46),
-        BackgroundColor3 = Config.Theme.Darker,
+    BackgroundColor3 = Config.Theme.Darker,
         BorderSizePixel = 0,
         Parent = Main,
         ZIndex = 3,
@@ -205,7 +203,7 @@ function Aurora:CreateWindow(config)
         Name = "BottomCover",
         Size = UDim2.new(1, 0, 0, 10),
         Position = UDim2.new(0, 0, 1, -10),
-        BackgroundColor3 = Config.Theme.Darker,
+    BackgroundColor3 = Config.Theme.Darker,
         BorderSizePixel = 0,
         Parent = TopBar,
         ZIndex = 3,
@@ -217,7 +215,7 @@ function Aurora:CreateWindow(config)
         Size = UDim2.new(0, 36, 0, 36),
         Position = UDim2.new(0, 14, 0.5, 0),
         AnchorPoint = Vector2.new(0, 0.5),
-        BackgroundColor3 = Config.Accent,
+    BackgroundColor3 = Config.Accent,
         BorderSizePixel = 0,
         Parent = TopBar,
         ZIndex = 4,
@@ -237,7 +235,7 @@ function Aurora:CreateWindow(config)
     local LogoIcon = Utility:Create("TextLabel", {
         Name = "Icon",
         Size = UDim2.new(1, 0, 1, 0),
-        BackgroundTransparency = 1,
+    BackgroundTransparency = 1,
         Text = "A",
         TextColor3 = Color3.new(1, 1, 1),
         TextScaled = true,
@@ -250,7 +248,7 @@ function Aurora:CreateWindow(config)
         Name = "Title",
         Size = UDim2.new(0, 200, 1, 0),
         Position = UDim2.new(0, 58, 0, 0),
-        BackgroundTransparency = 1,
+    BackgroundTransparency = 1,
         Text = Config.Title,
         TextColor3 = Config.Theme.Text,
         TextXAlignment = Enum.TextXAlignment.Left,
@@ -265,7 +263,7 @@ function Aurora:CreateWindow(config)
         Name = "Controls",
         Size = UDim2.new(0, 100, 1, 0),
         Position = UDim2.new(1, -110, 0, 0),
-        BackgroundTransparency = 1,
+    BackgroundTransparency = 1,
         Parent = TopBar,
         ZIndex = 4,
     })
@@ -282,7 +280,7 @@ function Aurora:CreateWindow(config)
         local btn = Utility:Create("TextButton", {
             Name = name,
             Size = UDim2.new(0, 32, 0, 32),
-            BackgroundColor3 = Config.Theme.Dark,
+        BackgroundColor3 = Config.Theme.Dark,
             BorderSizePixel = 0,
             Parent = ControlsContainer,
             ZIndex = 5,
@@ -298,7 +296,7 @@ function Aurora:CreateWindow(config)
         local iconLabel = Utility:Create("TextLabel", {
             Name = "Icon",
             Size = UDim2.new(1, 0, 1, 0),
-            BackgroundTransparency = 1,
+        BackgroundTransparency = 1,
             Text = icon,
             TextColor3 = color or Config.Theme.TextMuted,
             TextSize = 14,
@@ -318,7 +316,7 @@ function Aurora:CreateWindow(config)
         Name = "Sidebar",
         Size = UDim2.new(0, 160, 1, -56),
         Position = UDim2.new(0, 0, 0, 50),
-        BackgroundColor3 = Config.Theme.Sidebar,
+    BackgroundColor3 = Config.Theme.Sidebar,
         BorderSizePixel = 0,
         Parent = Main,
         ZIndex = 2,
@@ -339,7 +337,7 @@ function Aurora:CreateWindow(config)
         Name = "TabScroll",
         Size = UDim2.new(1, -8, 1, -8),
         Position = UDim2.new(0, 4, 0, 4),
-        BackgroundTransparency = 1,
+    BackgroundTransparency = 1,
         BorderSizePixel = 0,
         ScrollBarThickness = 0,
         ScrollBarImageTransparency = 1,
@@ -362,7 +360,7 @@ function Aurora:CreateWindow(config)
         Name = "Content",
         Size = UDim2.new(1, -176, 1, -56),
         Position = UDim2.new(0, 168, 0, 50),
-        BackgroundTransparency = 1,
+    BackgroundTransparency = 1,
         BorderSizePixel = 0,
         Parent = Main,
         ZIndex = 2,
@@ -375,7 +373,7 @@ function Aurora:CreateWindow(config)
         Size = UDim2.new(0, 320, 1, -60),
         Position = UDim2.new(1, -10, 0, 56),
         AnchorPoint = Vector2.new(1, 0),
-        BackgroundTransparency = 1,
+    BackgroundTransparency = 1,
         Parent = Main,
         ZIndex = 10,
     })
@@ -405,7 +403,7 @@ function Aurora:CreateWindow(config)
             Name = Tab.Name,
             Size = UDim2.new(1, -8, 0, 38),
             Position = UDim2.new(0, 4, 0, 0),
-            BackgroundColor3 = Config.Theme.TabInactive,
+        BackgroundColor3 = Config.Theme.TabInactive,
             BorderSizePixel = 0,
             Parent = TabScroll,
             Text = "",
@@ -422,7 +420,7 @@ function Aurora:CreateWindow(config)
             Name = "Icon",
             Size = UDim2.new(0, 22, 1, 0),
             Position = UDim2.new(0, 10, 0, 0),
-            BackgroundTransparency = 1,
+        BackgroundTransparency = 1,
             Text = config.Icon or "●",
             TextColor3 = Config.Theme.TextMuted,
             TextSize = 14,
@@ -435,7 +433,7 @@ function Aurora:CreateWindow(config)
             Name = "Label",
             Size = UDim2.new(1, -40, 1, 0),
             Position = UDim2.new(0, 36, 0, 0),
-            BackgroundTransparency = 1,
+        BackgroundTransparency = 1,
             Text = Tab.Name,
             TextColor3 = Config.Theme.TextMuted,
             TextXAlignment = Enum.TextXAlignment.Left,
@@ -448,7 +446,7 @@ function Aurora:CreateWindow(config)
         local TabContent = Utility:Create("ScrollingFrame", {
             Name = "Content",
             Size = UDim2.new(1, 0, 1, 0),
-            BackgroundTransparency = 1,
+        BackgroundTransparency = 1,
             BorderSizePixel = 0,
             ScrollBarThickness = 4,
             ScrollBarImageColor3 = Config.Theme.Border,
@@ -512,7 +510,7 @@ function Aurora:CreateWindow(config)
             local SectionFrame = Utility:Create("Frame", {
                 Name = Section.Name,
                 Size = UDim2.new(1, 0, 0, 0),
-                BackgroundColor3 = Config.Theme.Card,
+            BackgroundColor3 = Config.Theme.Card,
                 BorderSizePixel = 0,
                 Parent = TabContent,
                 ZIndex = 2,
@@ -546,7 +544,7 @@ function Aurora:CreateWindow(config)
             local SectionHeader = Utility:Create("Frame", {
                 Name = "Header",
                 Size = UDim2.new(1, 0, 0, 26),
-                BackgroundTransparency = 1,
+            BackgroundTransparency = 1,
                 Parent = SectionFrame,
                 ZIndex = 3,
             })
@@ -554,7 +552,7 @@ function Aurora:CreateWindow(config)
             local SectionLabel = Utility:Create("TextLabel", {
                 Name = "Label",
                 Size = UDim2.new(1, -24, 1, 0),
-                BackgroundTransparency = 1,
+            BackgroundTransparency = 1,
                 Text = Section.Name,
                 TextColor3 = Config.Theme.Text,
                 TextXAlignment = Enum.TextXAlignment.Left,
@@ -569,7 +567,7 @@ function Aurora:CreateWindow(config)
                 Size = UDim2.new(0, 18, 0, 18),
                 Position = UDim2.new(1, -18, 0, 0),
                 AnchorPoint = Vector2.new(1, 0),
-                BackgroundTransparency = 1,
+            BackgroundTransparency = 1,
                 Text = config.Icon or "◆",
                 TextColor3 = Config.Accent,
                 TextSize = 12,
@@ -586,7 +584,7 @@ function Aurora:CreateWindow(config)
                 local LabelFrame = Utility:Create("Frame", {
                     Name = "Label",
                     Size = UDim2.new(1, 0, 0, 24),
-                    BackgroundTransparency = 1,
+                BackgroundTransparency = 1,
                     Parent = SectionFrame,
                     ZIndex = 3,
                 })
@@ -594,7 +592,7 @@ function Aurora:CreateWindow(config)
                 local LabelText = Utility:Create("TextLabel", {
                     Name = "Text",
                     Size = UDim2.new(1, 0, 1, 0),
-                    BackgroundTransparency = 1,
+                BackgroundTransparency = 1,
                     Text = config.Text or "",
                     TextColor3 = config.Color or Config.Theme.TextMuted,
                     TextXAlignment = Enum.TextXAlignment.Left,
@@ -617,7 +615,7 @@ function Aurora:CreateWindow(config)
                 local ButtonFrame = Utility:Create("Frame", {
                     Name = "Button",
                     Size = UDim2.new(1, 0, 0, 40),
-                    BackgroundColor3 = Config.Theme.TabInactive,
+                BackgroundColor3 = Config.Theme.TabInactive,
                     BorderSizePixel = 0,
                     Parent = SectionFrame,
                     ZIndex = 3,
@@ -640,7 +638,7 @@ function Aurora:CreateWindow(config)
                     Size = UDim2.new(1, -8, 1, -8),
                     Position = UDim2.new(0.5, 0, 0.5, 0),
                     AnchorPoint = Vector2.new(0.5, 0.5),
-                    BackgroundTransparency = 1,
+                BackgroundTransparency = 1,
                     Text = config.Title or "Button",
                     TextColor3 = Config.Theme.Text,
                     TextSize = 14,
@@ -657,7 +655,7 @@ function Aurora:CreateWindow(config)
                         Size = UDim2.new(0, 20, 0, 20),
                         Position = UDim2.new(0, 10, 0.5, 0),
                         AnchorPoint = Vector2.new(0, 0.5),
-                        BackgroundTransparency = 1,
+                    BackgroundTransparency = 1,
                         Text = config.Icon,
                         TextColor3 = config.IconColor or Config.Accent,
                         TextSize = 14,
@@ -711,7 +709,7 @@ function Aurora:CreateWindow(config)
                 local ToggleFrame = Utility:Create("Frame", {
                     Name = "Toggle",
                     Size = UDim2.new(1, 0, 0, 44),
-                    BackgroundTransparency = 1,
+                BackgroundTransparency = 1,
                     Parent = SectionFrame,
                     ZIndex = 3,
                 })
@@ -719,7 +717,7 @@ function Aurora:CreateWindow(config)
                 local ToggleContent = Utility:Create("Frame", {
                     Name = "Content",
                     Size = UDim2.new(1, -60, 1, 0),
-                    BackgroundTransparency = 1,
+                BackgroundTransparency = 1,
                     Parent = ToggleFrame,
                     ZIndex = 4,
                 })
@@ -727,7 +725,7 @@ function Aurora:CreateWindow(config)
                 local ToggleLabel = Utility:Create("TextLabel", {
                     Name = "Label",
                     Size = UDim2.new(1, 0, 0, 22),
-                    BackgroundTransparency = 1,
+                BackgroundTransparency = 1,
                     Text = config.Title or "Toggle",
                     TextColor3 = Config.Theme.Text,
                     TextXAlignment = Enum.TextXAlignment.Left,
@@ -743,7 +741,7 @@ function Aurora:CreateWindow(config)
                         Name = "Description",
                         Size = UDim2.new(1, 0, 0, 18),
                         Position = UDim2.new(0, 0, 0, 20),
-                        BackgroundTransparency = 1,
+                    BackgroundTransparency = 1,
                         Text = config.Description,
                         TextColor3 = Config.Theme.TextMuted,
                         TextXAlignment = Enum.TextXAlignment.Left,
@@ -759,7 +757,7 @@ function Aurora:CreateWindow(config)
                     Size = UDim2.new(0, 48, 0, 26),
                     Position = UDim2.new(1, 0, 0.5, 0),
                     AnchorPoint = Vector2.new(1, 0.5),
-                    BackgroundColor3 = Config.Theme.Darkest,
+                BackgroundColor3 = Config.Theme.Darkest,
                     BorderSizePixel = 0,
                     Parent = ToggleFrame,
                     Text = "",
@@ -777,7 +775,7 @@ function Aurora:CreateWindow(config)
                     Size = UDim2.new(0, 18, 0, 18),
                     Position = state and UDim2.new(1, -5, 0.5, 0) or UDim2.new(0, 5, 0.5, 0),
                     AnchorPoint = Vector2.new(0, 0.5),
-                    BackgroundColor3 = Config.Theme.Text,
+                BackgroundColor3 = Config.Theme.Text,
                     BorderSizePixel = 0,
                     Parent = ToggleBox,
                     ZIndex = 6,
@@ -839,7 +837,7 @@ function Aurora:CreateWindow(config)
                 local SliderFrame = Utility:Create("Frame", {
                     Name = "Slider",
                     Size = UDim2.new(1, 0, 0, 60),
-                    BackgroundTransparency = 1,
+                BackgroundTransparency = 1,
                     Parent = SectionFrame,
                     ZIndex = 3,
                 })
@@ -847,7 +845,7 @@ function Aurora:CreateWindow(config)
                 local SliderHeader = Utility:Create("Frame", {
                     Name = "Header",
                     Size = UDim2.new(1, -50, 0, 22),
-                    BackgroundTransparency = 1,
+                BackgroundTransparency = 1,
                     Parent = SliderFrame,
                     ZIndex = 4,
                 })
@@ -855,7 +853,7 @@ function Aurora:CreateWindow(config)
                 local SliderLabel = Utility:Create("TextLabel", {
                     Name = "Label",
                     Size = UDim2.new(1, 0, 1, 0),
-                    BackgroundTransparency = 1,
+                BackgroundTransparency = 1,
                     Text = config.Title or "Slider",
                     TextColor3 = Config.Theme.Text,
                     TextXAlignment = Enum.TextXAlignment.Left,
@@ -870,7 +868,7 @@ function Aurora:CreateWindow(config)
                     Size = UDim2.new(0, 50, 1, 0),
                     Position = UDim2.new(1, 0, 0, 0),
                     AnchorPoint = Vector2.new(1, 0),
-                    BackgroundColor3 = Config.Theme.Darkest,
+                BackgroundColor3 = Config.Theme.Darkest,
                     BorderSizePixel = 0,
                     Text = tostring(value),
                     TextColor3 = Config.Theme.Text,
@@ -889,7 +887,7 @@ function Aurora:CreateWindow(config)
                     Name = "Track",
                     Size = UDim2.new(1, 0, 0, 8),
                     Position = UDim2.new(0, 0, 0, 32),
-                    BackgroundColor3 = Config.Theme.Darkest,
+                BackgroundColor3 = Config.Theme.Darkest,
                     BorderSizePixel = 0,
                     Parent = SliderFrame,
                     ZIndex = 5,
@@ -903,7 +901,7 @@ function Aurora:CreateWindow(config)
                 local SliderFill = Utility:Create("Frame", {
                     Name = "Fill",
                     Size = UDim2.new((value - min) / (max - min), 0, 1, 0),
-                    BackgroundColor3 = Config.Accent,
+                BackgroundColor3 = Config.Accent,
                     BorderSizePixel = 0,
                     Parent = SliderTrack,
                     ZIndex = 6,
@@ -919,7 +917,7 @@ function Aurora:CreateWindow(config)
                     Size = UDim2.new(0, 18, 0, 18),
                     Position = UDim2.new((value - min) / (max - min), -9, 0.5, 0),
                     AnchorPoint = Vector2.new(0.5, 0.5),
-                    BackgroundColor3 = Color3.new(1, 1, 1),
+                BackgroundColor3 = Color3.new(1, 1, 1),
                     BorderSizePixel = 0,
                     Parent = SliderTrack,
                     ZIndex = 7,
@@ -1018,7 +1016,7 @@ function Aurora:CreateWindow(config)
                 local DropdownFrame = Utility:Create("Frame", {
                     Name = "Dropdown",
                     Size = UDim2.new(1, 0, 0, 44),
-                    BackgroundTransparency = 1,
+                BackgroundTransparency = 1,
                     Parent = SectionFrame,
                     ZIndex = 3,
                 })
@@ -1026,7 +1024,7 @@ function Aurora:CreateWindow(config)
                 local DropdownContent = Utility:Create("Frame", {
                     Name = "Content",
                     Size = UDim2.new(1, -40, 1, 0),
-                    BackgroundTransparency = 1,
+                BackgroundTransparency = 1,
                     Parent = DropdownFrame,
                     ZIndex = 4,
                 })
@@ -1034,7 +1032,7 @@ function Aurora:CreateWindow(config)
                 local DropdownLabel = Utility:Create("TextLabel", {
                     Name = "Label",
                     Size = UDim2.new(1, 0, 0, 22),
-                    BackgroundTransparency = 1,
+                BackgroundTransparency = 1,
                     Text = config.Title or "Dropdown",
                     TextColor3 = Config.Theme.Text,
                     TextXAlignment = Enum.TextXAlignment.Left,
@@ -1048,7 +1046,7 @@ function Aurora:CreateWindow(config)
                     Name = "Value",
                     Size = UDim2.new(1, 0, 0, 18),
                     Position = UDim2.new(0, 0, 0, 20),
-                    BackgroundTransparency = 1,
+                BackgroundTransparency = 1,
                     Text = selected or "Select...",
                     TextColor3 = selected and Config.Theme.Text or Config.Theme.TextMuted,
                     TextXAlignment = Enum.TextXAlignment.Left,
@@ -1063,7 +1061,7 @@ function Aurora:CreateWindow(config)
                     Size = UDim2.new(0, 36, 0, 36),
                     Position = UDim2.new(1, 0, 0.5, 0),
                     AnchorPoint = Vector2.new(1, 0.5),
-                    BackgroundColor3 = Config.Theme.TabInactive,
+                BackgroundColor3 = Config.Theme.TabInactive,
                     BorderSizePixel = 0,
                     Text = "▼",
                     TextColor3 = Config.Theme.TextMuted,
@@ -1083,7 +1081,7 @@ function Aurora:CreateWindow(config)
                     Name = "List",
                     Size = UDim2.new(1, 0, 0, 0),
                     Position = UDim2.new(0, 0, 0, 48),
-                    BackgroundColor3 = Config.Theme.Card,
+                BackgroundColor3 = Config.Theme.Card,
                     BorderSizePixel = 0,
                     Visible = false,
                     ClipsDescendants = true,
@@ -1131,7 +1129,7 @@ function Aurora:CreateWindow(config)
                         Name = item,
                         Size = UDim2.new(1, -8, 0, 30),
                         Position = UDim2.new(0, 4, 0, 0),
-                        BackgroundTransparency = 1,
+                    BackgroundTransparency = 1,
                         Text = item,
                         TextColor3 = Config.Theme.Text,
                         TextXAlignment = Enum.TextXAlignment.Left,
@@ -1217,7 +1215,7 @@ function Aurora:CreateWindow(config)
                 local InputFrame = Utility:Create("Frame", {
                     Name = "Input",
                     Size = UDim2.new(1, 0, 0, 44),
-                    BackgroundTransparency = 1,
+                BackgroundTransparency = 1,
                     Parent = SectionFrame,
                     ZIndex = 3,
                 })
@@ -1225,7 +1223,7 @@ function Aurora:CreateWindow(config)
                 local InputContent = Utility:Create("Frame", {
                     Name = "Content",
                     Size = UDim2.new(1, -60, 1, 0),
-                    BackgroundTransparency = 1,
+                BackgroundTransparency = 1,
                     Parent = InputFrame,
                     ZIndex = 4,
                 })
@@ -1233,7 +1231,7 @@ function Aurora:CreateWindow(config)
                 local InputLabel = Utility:Create("TextLabel", {
                     Name = "Label",
                     Size = UDim2.new(1, 0, 0, 22),
-                    BackgroundTransparency = 1,
+                BackgroundTransparency = 1,
                     Text = config.Title or "Input",
                     TextColor3 = Config.Theme.Text,
                     TextXAlignment = Enum.TextXAlignment.Left,
@@ -1247,7 +1245,7 @@ function Aurora:CreateWindow(config)
                     Name = "Box",
                     Size = UDim2.new(1, 0, 0, 28),
                     Position = UDim2.new(0, 0, 0, 22),
-                    BackgroundColor3 = Config.Theme.Darkest,
+                BackgroundColor3 = Config.Theme.Darkest,
                     BorderSizePixel = 0,
                     Text = config.Default or "",
                     PlaceholderText = config.Placeholder or "Enter text...",
@@ -1276,7 +1274,7 @@ function Aurora:CreateWindow(config)
                     Size = UDim2.new(0, 36, 0, 36),
                     Position = UDim2.new(1, 0, 0.5, 0),
                     AnchorPoint = Vector2.new(1, 0.5),
-                    BackgroundColor3 = Config.Theme.TabInactive,
+                BackgroundColor3 = Config.Theme.TabInactive,
                     BorderSizePixel = 0,
                     Text = "×",
                     TextColor3 = Config.Theme.TextMuted,
@@ -1347,7 +1345,7 @@ function Aurora:CreateWindow(config)
                 local KeybindFrame = Utility:Create("Frame", {
                     Name = "Keybind",
                     Size = UDim2.new(1, 0, 0, 44),
-                    BackgroundTransparency = 1,
+                BackgroundTransparency = 1,
                     Parent = SectionFrame,
                     ZIndex = 3,
                 })
@@ -1355,7 +1353,7 @@ function Aurora:CreateWindow(config)
                 local KeybindContent = Utility:Create("Frame", {
                     Name = "Content",
                     Size = UDim2.new(1, -110, 1, 0),
-                    BackgroundTransparency = 1,
+                BackgroundTransparency = 1,
                     Parent = KeybindFrame,
                     ZIndex = 4,
                 })
@@ -1363,7 +1361,7 @@ function Aurora:CreateWindow(config)
                 local KeybindLabel = Utility:Create("TextLabel", {
                     Name = "Label",
                     Size = UDim2.new(1, 0, 0, 22),
-                    BackgroundTransparency = 1,
+                BackgroundTransparency = 1,
                     Text = config.Title or "Keybind",
                     TextColor3 = Config.Theme.Text,
                     TextXAlignment = Enum.TextXAlignment.Left,
@@ -1379,7 +1377,7 @@ function Aurora:CreateWindow(config)
                         Name = "Description",
                         Size = UDim2.new(1, 0, 0, 16),
                         Position = UDim2.new(0, 0, 0, 20),
-                        BackgroundTransparency = 1,
+                    BackgroundTransparency = 1,
                         Text = config.Description,
                         TextColor3 = Config.Theme.TextMuted,
                         TextXAlignment = Enum.TextXAlignment.Left,
@@ -1395,7 +1393,7 @@ function Aurora:CreateWindow(config)
                     Size = UDim2.new(0, 100, 0, 34),
                     Position = UDim2.new(1, 0, 0.5, 0),
                     AnchorPoint = Vector2.new(1, 0.5),
-                    BackgroundColor3 = Config.Theme.TabInactive,
+                BackgroundColor3 = Config.Theme.TabInactive,
                     BorderSizePixel = 0,
                     Text = currentKey.Name or "None",
                     TextColor3 = Config.Theme.Text,
@@ -1457,7 +1455,7 @@ function Aurora:CreateWindow(config)
                 local ColorPickerFrame = Utility:Create("Frame", {
                     Name = "ColorPicker",
                     Size = UDim2.new(1, 0, 0, 60),
-                    BackgroundTransparency = 1,
+                BackgroundTransparency = 1,
                     Parent = SectionFrame,
                     ZIndex = 3,
                 })
@@ -1465,7 +1463,7 @@ function Aurora:CreateWindow(config)
                 local ColorPickerContent = Utility:Create("Frame", {
                     Name = "Content",
                     Size = UDim2.new(1, -60, 1, 0),
-                    BackgroundTransparency = 1,
+                BackgroundTransparency = 1,
                     Parent = ColorPickerFrame,
                     ZIndex = 4,
                 })
@@ -1473,7 +1471,7 @@ function Aurora:CreateWindow(config)
                 local ColorPickerLabel = Utility:Create("TextLabel", {
                     Name = "Label",
                     Size = UDim2.new(1, 0, 0, 22),
-                    BackgroundTransparency = 1,
+                BackgroundTransparency = 1,
                     Text = config.Title or "Color",
                     TextColor3 = Config.Theme.Text,
                     TextXAlignment = Enum.TextXAlignment.Left,
@@ -1487,7 +1485,7 @@ function Aurora:CreateWindow(config)
                     Name = "Preview",
                     Size = UDim2.new(0, 40, 0, 26),
                     Position = UDim2.new(0, 0, 0, 26),
-                    BackgroundColor3 = currentColor,
+                BackgroundColor3 = currentColor,
                     BorderSizePixel = 0,
                     Parent = ColorPickerContent,
                     ZIndex = 5,
@@ -1502,7 +1500,7 @@ function Aurora:CreateWindow(config)
                     Name = "Hex",
                     Size = UDim2.new(1, -50, 1, 0),
                     Position = UDim2.new(0, 46, 0, 26),
-                    BackgroundColor3 = Config.Theme.Darkest,
+                BackgroundColor3 = Config.Theme.Darkest,
                     BorderSizePixel = 0,
                     Text = "#" .. currentColor:ToHex(),
                     TextColor3 = Config.Theme.Text,
@@ -1522,7 +1520,7 @@ function Aurora:CreateWindow(config)
                     Size = UDim2.new(0, 50, 0, 34),
                     Position = UDim2.new(1, 0, 0.5, 0),
                     AnchorPoint = Vector2.new(1, 0.5),
-                    BackgroundColor3 = Config.Theme.TabInactive,
+                BackgroundColor3 = Config.Theme.TabInactive,
                     BorderSizePixel = 0,
                     Text = "Pick",
                     TextColor3 = Config.Theme.Text,
@@ -1557,7 +1555,7 @@ function Aurora:CreateWindow(config)
                 local DividerFrame = Utility:Create("Frame", {
                     Name = "Divider",
                     Size = UDim2.new(1, 0, 0, config.Height or 16),
-                    BackgroundTransparency = 1,
+                BackgroundTransparency = 1,
                     Parent = SectionFrame,
                     ZIndex = 3,
                 })
@@ -1567,7 +1565,7 @@ function Aurora:CreateWindow(config)
                         Name = "Line",
                         Size = UDim2.new(1, 0, 0, 1),
                         Position = UDim2.new(0, 0, 0.5, 0),
-                        BackgroundColor3 = Config.Theme.Border,
+                    BackgroundColor3 = Config.Theme.Border,
                         BorderSizePixel = 0,
                         Parent = DividerFrame,
                         ZIndex = 4,
@@ -1581,7 +1579,7 @@ function Aurora:CreateWindow(config)
                 local SeparatorFrame = Utility:Create("Frame", {
                     Name = "Separator",
                     Size = UDim2.new(1, 0, 0, 1),
-                    BackgroundColor3 = Config.Theme.Border,
+                BackgroundColor3 = Config.Theme.Border,
                     BorderSizePixel = 0,
                     Parent = SectionFrame,
                     ZIndex = 3,
@@ -1612,7 +1610,7 @@ function Aurora:CreateWindow(config)
         local NotifFrame = Utility:Create("Frame", {
             Name = "Notification",
             Size = UDim2.new(1, 0, 0, 70),
-            BackgroundColor3 = Config.Theme.Card,
+        BackgroundColor3 = Config.Theme.Card,
             BorderSizePixel = 0,
             ZIndex = 15,
         })
@@ -1634,7 +1632,7 @@ function Aurora:CreateWindow(config)
             Name = "Icon",
             Size = UDim2.new(0, 30, 0, 30),
             Position = UDim2.new(0, 12, 0, 12),
-            BackgroundTransparency = 1,
+        BackgroundTransparency = 1,
             Text = config.Type == "Success" and "✓" or 
                    config.Type == "Warning" and "⚠" or 
                    config.Type == "Error" and "✕" or "ℹ",
@@ -1651,7 +1649,7 @@ function Aurora:CreateWindow(config)
             Name = "Title",
             Size = UDim2.new(1, -50, 0, 20),
             Position = UDim2.new(0, 50, 0, 12),
-            BackgroundTransparency = 1,
+        BackgroundTransparency = 1,
             Text = config.Title or "Notification",
             TextColor3 = Config.Theme.Text,
             TextXAlignment = Enum.TextXAlignment.Left,
@@ -1665,7 +1663,7 @@ function Aurora:CreateWindow(config)
             Name = "Description",
             Size = UDim2.new(1, -50, 0, 28),
             Position = UDim2.new(0, 50, 0, 30),
-            BackgroundTransparency = 1,
+        BackgroundTransparency = 1,
             Text = config.Description or "",
             TextColor3 = Config.Theme.TextMuted,
             TextXAlignment = Enum.TextXAlignment.Left,
@@ -1759,3 +1757,5 @@ function Aurora:CreateWindow(config)
 end
 
 return Aurora
+
+
