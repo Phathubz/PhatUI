@@ -1,6 +1,6 @@
 --[[
-    Phat UI Library v2.0
-    A premium Roblox UI library with modern design
+    Phat UI Library v2.1
+    Premium Roblox UI with advanced features
 ]]
 
 local Phat = {}
@@ -9,14 +9,11 @@ Phat.__index = Phat
 local TweenService = game:GetService("TweenService")
 local UIS = game:GetService("UserInputService")
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local Lighting = game:GetService("Lighting")
 
 local Player = Players.LocalPlayer
 local PlayerGui = Player:WaitForChild("PlayerGui")
 
 local EASING_STYLE = Enum.EasingStyle.Quad
-local EASING_DIR = Enum.EasingDirection.Out
 
 local function Create(class, props, children)
     local inst = Instance.new(class)
@@ -34,25 +31,16 @@ local function Create(class, props, children)
     return inst
 end
 
-local function Tween(obj, props, duration)
+local function Tween(obj, props, duration, easingStyle)
     duration = duration or 0.25
-    local tween = TweenService:Create(obj, TweenInfo.new(duration, EASING_STYLE, EASING_DIR), props)
+    easingStyle = easingStyle or EASING_STYLE
+    local tween = TweenService:Create(obj, TweenInfo.new(duration, easingStyle, Enum.EasingDirection.Out), props)
     tween:Play()
     return tween
 end
 
 local function Dragify(frame)
-    local dragging
-    local dragInput
-    local dragStart
-    local startPos
-
-    local function update(input)
-        local delta = input.Position - dragStart
-        local absPos = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-        Tween(frame, {Position = absPos}, 0.1)
-    end
-
+    local dragging, dragInput, dragStart, startPos
     frame.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
@@ -60,22 +48,21 @@ local function Dragify(frame)
             startPos = frame.Position
         end
     end)
-
     frame.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = false
         end
     end)
-
     frame.InputChanged:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
             dragInput = input
         end
     end)
-
     UIS.InputChanged:Connect(function(input)
         if input == dragInput and dragging then
-            update(input)
+            local delta = input.Position - dragStart
+            local absPos = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+            Tween(frame, {Position = absPos}, 0.08)
         end
     end)
 end
@@ -84,11 +71,11 @@ local ThemePresets = {
     Dark = {
         Background = Color3.fromRGB(15, 15, 15),
         BackgroundDark = Color3.fromRGB(10, 10, 10),
-        BackgroundLight = Color3.fromRGB(20, 20, 20),
-        Card = Color3.fromRGB(22, 22, 25),
-        CardHover = Color3.fromRGB(28, 28, 32),
+        BackgroundLight = Color3.fromRGB(22, 22, 25),
+        Card = Color3.fromRGB(25, 25, 28),
+        CardHover = Color3.fromRGB(32, 32, 36),
         Sidebar = Color3.fromRGB(12, 12, 14),
-        Border = Color3.fromRGB(40, 40, 48),
+        Border = Color3.fromRGB(45, 45, 55),
         Text = Color3.fromRGB(255, 255, 255),
         TextMuted = Color3.fromRGB(140, 140, 150),
         Accent = Color3.fromRGB(88, 166, 255),
@@ -96,16 +83,16 @@ local ThemePresets = {
         Success = Color3.fromRGB(60, 200, 120),
         Warning = Color3.fromRGB(255, 200, 60),
         Error = Color3.fromRGB(255, 80, 80),
-        Toggle = Color3.fromRGB(50, 50, 58),
+        Toggle = Color3.fromRGB(55, 55, 65),
     },
     Light = {
-        Background = Color3.fromRGB(245, 245, 250),
-        BackgroundDark = Color3.fromRGB(235, 235, 240),
+        Background = Color3.fromRGB(248, 248, 252),
+        BackgroundDark = Color3.fromRGB(240, 240, 245),
         BackgroundLight = Color3.fromRGB(255, 255, 255),
         Card = Color3.fromRGB(255, 255, 255),
-        CardHover = Color3.fromRGB(248, 248, 252),
-        Sidebar = Color3.fromRGB(240, 240, 245),
-        Border = Color3.fromRGB(220, 220, 230),
+        CardHover = Color3.fromRGB(245, 245, 250),
+        Sidebar = Color3.fromRGB(242, 242, 248),
+        Border = Color3.fromRGB(215, 215, 225),
         Text = Color3.fromRGB(20, 20, 25),
         TextMuted = Color3.fromRGB(100, 100, 110),
         Accent = Color3.fromRGB(0, 120, 255),
@@ -116,30 +103,30 @@ local ThemePresets = {
         Toggle = Color3.fromRGB(200, 200, 210),
     },
     Midnight = {
-        Background = Color3.fromRGB(5, 5, 10),
-        BackgroundDark = Color3.fromRGB(3, 3, 6),
-        BackgroundLight = Color3.fromRGB(10, 10, 15),
-        Card = Color3.fromRGB(12, 12, 18),
-        CardHover = Color3.fromRGB(18, 18, 25),
-        Sidebar = Color3.fromRGB(8, 8, 12),
-        Border = Color3.fromRGB(30, 30, 45),
+        Background = Color3.fromRGB(8, 8, 12),
+        BackgroundDark = Color3.fromRGB(5, 5, 8),
+        BackgroundLight = Color3.fromRGB(15, 15, 20),
+        Card = Color3.fromRGB(18, 18, 25),
+        CardHover = Color3.fromRGB(25, 25, 35),
+        Sidebar = Color3.fromRGB(6, 6, 10),
+        Border = Color3.fromRGB(35, 35, 50),
         Text = Color3.fromRGB(255, 255, 255),
-        TextMuted = Color3.fromRGB(100, 100, 120),
+        TextMuted = Color3.fromRGB(110, 110, 130),
         Accent = Color3.fromRGB(140, 80, 255),
         AccentDark = Color3.fromRGB(100, 50, 200),
         Success = Color3.fromRGB(60, 200, 120),
         Warning = Color3.fromRGB(255, 200, 60),
         Error = Color3.fromRGB(255, 80, 80),
-        Toggle = Color3.fromRGB(35, 35, 50),
+        Toggle = Color3.fromRGB(40, 40, 55),
     },
     Ocean = {
         Background = Color3.fromRGB(10, 20, 35),
         BackgroundDark = Color3.fromRGB(5, 12, 25),
-        BackgroundLight = Color3.fromRGB(15, 28, 45),
-        Card = Color3.fromRGB(18, 30, 48),
-        CardHover = Color3.fromRGB(25, 40, 60),
+        BackgroundLight = Color3.fromRGB(18, 30, 50),
+        Card = Color3.fromRGB(22, 35, 55),
+        CardHover = Color3.fromRGB(30, 45, 65),
         Sidebar = Color3.fromRGB(8, 15, 28),
-        Border = Color3.fromRGB(35, 60, 90),
+        Border = Color3.fromRGB(40, 65, 95),
         Text = Color3.fromRGB(255, 255, 255),
         TextMuted = Color3.fromRGB(120, 160, 200),
         Accent = Color3.fromRGB(80, 200, 255),
@@ -147,16 +134,16 @@ local ThemePresets = {
         Success = Color3.fromRGB(60, 200, 120),
         Warning = Color3.fromRGB(255, 200, 60),
         Error = Color3.fromRGB(255, 80, 80),
-        Toggle = Color3.fromRGB(40, 70, 100),
+        Toggle = Color3.fromRGB(45, 75, 105),
     },
     Sunset = {
         Background = Color3.fromRGB(25, 15, 20),
         BackgroundDark = Color3.fromRGB(18, 10, 14),
-        BackgroundLight = Color3.fromRGB(35, 22, 28),
-        Card = Color3.fromRGB(38, 25, 32),
-        CardHover = Color3.fromRGB(48, 32, 42),
+        BackgroundLight = Color3.fromRGB(40, 25, 32),
+        Card = Color3.fromRGB(45, 28, 36),
+        CardHover = Color3.fromRGB(55, 35, 45),
         Sidebar = Color3.fromRGB(20, 12, 16),
-        Border = Color3.fromRGB(70, 45, 55),
+        Border = Color3.fromRGB(75, 50, 60),
         Text = Color3.fromRGB(255, 255, 255),
         TextMuted = Color3.fromRGB(180, 140, 150),
         Accent = Color3.fromRGB(255, 120, 150),
@@ -164,9 +151,12 @@ local ThemePresets = {
         Success = Color3.fromRGB(60, 200, 120),
         Warning = Color3.fromRGB(255, 200, 60),
         Error = Color3.fromRGB(255, 80, 80),
-        Toggle = Color3.fromRGB(80, 50, 60),
-    }
+        Toggle = Color3.fromRGB(85, 55, 65),
+    },
 }
+
+getgenv().PhatUI = getgenv().PhatUI or {}
+local PhatData = getgenv().PhatUI
 
 function Phat:CreateWindow(config)
     local Window = {}
@@ -174,6 +164,7 @@ function Phat:CreateWindow(config)
     Window.Flags = {}
     Window.Tabs = {}
     Window.CurrentTab = nil
+    Window.Running = true
 
     local cfg = {
         Title = config.Title or "Phat UI",
@@ -184,9 +175,11 @@ function Phat:CreateWindow(config)
         Acrylic = config.Acrylic or false,
         Theme = config.Theme or "Dark",
         Accent = config.Accent or nil,
-        MinimizeKey = config.MinimizeKey or Enum.KeyCode.LeftControl,
-        ToggleKey = config.ToggleKey or nil,
+        MinimizeKey = config.MinimizeKey or Enum.KeyCode.F1,
+        ToggleKey = config.ToggleKey or Enum.KeyCode.RightControl,
         Watermark = config.Watermark or false,
+        SaveConfig = config.SaveConfig or false,
+        ConfigName = config.ConfigName or "PhatConfig",
     }
 
     local Theme = ThemePresets[cfg.Theme] or ThemePresets.Dark
@@ -216,18 +209,17 @@ function Phat:CreateWindow(config)
 
     Dragify(Main)
 
-    local MainCorner = Create("UICorner", {CornerRadius = UDim.new(0, 12), Parent = Main})
-    local MainStroke = Create("UIStroke", {Color = Theme.Border, Thickness = 1, Parent = Main})
+    Create("UICorner", {CornerRadius = UDim.new(0, 12), Parent = Main})
+    Create("UIStroke", {Color = Theme.Border, Thickness = 1, Parent = Main})
 
     if cfg.Acrylic then
-        local Blur = Create("ImageLabel", {
-            Name = "AcrylicBlur",
+        Create("ImageLabel", {
             Size = UDim2.new(1, 0, 1, 0),
-            BackgroundTransparency = 0.95,
+            BackgroundTransparency = 0.97,
             BackgroundColor3 = Theme.Background,
             Image = "rbxassetid://5554236805",
             ImageColor3 = Color3.new(0, 0, 0),
-            ImageTransparency = 0.9,
+            ImageTransparency = 0.92,
             ScaleType = Enum.ScaleType.Tile,
             TileSize = UDim2.new(0, 180, 0, 180),
             Parent = Main,
@@ -245,10 +237,9 @@ function Phat:CreateWindow(config)
     })
 
     Create("UICorner", {CornerRadius = UDim.new(0, 12), Parent = TopBar})
-
     Create("Frame", {
-        Size = UDim2.new(1, 0, 0, 8),
-        Position = UDim2.new(0, 0, 1, -8),
+        Size = UDim2.new(1, 0, 0, 10),
+        Position = UDim2.new(0, 0, 1, -10),
         BackgroundColor3 = Theme.BackgroundDark,
         BorderSizePixel = 0,
         Parent = TopBar,
@@ -256,14 +247,14 @@ function Phat:CreateWindow(config)
     })
 
     local TitleContainer = Create("Frame", {
-        Size = UDim2.new(1, -120, 1, 0),
+        Size = UDim2.new(1, -150, 1, 0),
         Position = UDim2.new(0, 16, 0, 0),
         BackgroundTransparency = 1,
         Parent = TopBar,
         ZIndex = 4,
     })
 
-    local TitleText = Create("TextLabel", {
+    Create("TextLabel", {
         Size = UDim2.new(1, 0, 0, 22),
         BackgroundTransparency = 1,
         Text = cfg.Title,
@@ -275,7 +266,7 @@ function Phat:CreateWindow(config)
         ZIndex = 4,
     })
 
-    local SubtitleText = Create("TextLabel", {
+    Create("TextLabel", {
         Size = UDim2.new(1, 0, 0, 16),
         Position = UDim2.new(0, 0, 0, 20),
         BackgroundTransparency = 1,
@@ -289,8 +280,8 @@ function Phat:CreateWindow(config)
     })
 
     local Controls = Create("Frame", {
-        Size = UDim2.new(0, 90, 1, 0),
-        Position = UDim2.new(1, -100, 0, 0),
+        Size = UDim2.new(0, 130, 1, 0),
+        Position = UDim2.new(1, -140, 0, 0),
         BackgroundTransparency = 1,
         Parent = TopBar,
         ZIndex = 4,
@@ -300,13 +291,13 @@ function Phat:CreateWindow(config)
         FillDirection = Enum.FillDirection.Horizontal,
         HorizontalAlignment = Enum.HorizontalAlignment.Right,
         VerticalAlignment = Enum.VerticalAlignment.Center,
-        Padding = UDim.new(0, 8),
+        Padding = UDim.new(0, 6),
         Parent = Controls,
     })
 
-    local function CreateBtn(name, icon, color)
+    local function CreateBtn(icon, color, tooltip)
         local btn = Create("TextButton", {
-            Size = UDim2.new(0, 32, 0, 32),
+            Size = UDim2.new(0, 34, 0, 34),
             BackgroundColor3 = Theme.BackgroundLight,
             BorderSizePixel = 0,
             Text = "",
@@ -328,8 +319,9 @@ function Phat:CreateWindow(config)
         return btn
     end
 
-    local MinBtn = CreateBtn("Minimize", "−", Theme.Text)
-    local CloseBtn = CreateBtn("Close", "×", Theme.Error)
+    local MinBtn = CreateBtn("−", Theme.Text, "Minimize")
+    local MaxBtn = CreateBtn("□", Theme.Text, "Maximize")
+    local CloseBtn = CreateBtn("×", Theme.Error, "Close")
 
     local Sidebar = Create("Frame", {
         Name = "Sidebar",
@@ -371,7 +363,7 @@ function Phat:CreateWindow(config)
 
     local NotifArea = Create("Frame", {
         Name = "Notifications",
-        Size = UDim2.new(0, 340, 1, -60),
+        Size = UDim2.new(0, 360, 1, -60),
         Position = UDim2.new(1, -10, 0, 56),
         AnchorPoint = Vector2.new(1, 0),
         BackgroundTransparency = 1,
@@ -380,49 +372,95 @@ function Phat:CreateWindow(config)
     })
 
     Create("UIListLayout", {
-        Padding = UDim.new(0, 8),
+        Padding = UDim.new(0, 10),
         HorizontalAlignment = Enum.HorizontalAlignment.Right,
         VerticalAlignment = Enum.VerticalAlignment.Top,
         Parent = NotifArea,
     })
 
     local minimized = false
+    local maximized = false
+    local originalSize = cfg.Size
+    local originalPos = cfg.Position
+    local originalSidebarSize = UDim2.new(0, cfg.TabWidth, 1, -52)
+    local originalContentSize = UDim2.new(1, -(cfg.TabWidth + 8), 1, -52)
 
-    MinBtn.MouseEnter:Connect(function()
-        Tween(MinBtn, {BackgroundColor3 = Theme.CardHover}, 0.1)
-    end)
-    MinBtn.MouseLeave:Connect(function()
-        Tween(MinBtn, {BackgroundColor3 = Theme.BackgroundLight}, 0.1)
-    end)
-    CloseBtn.MouseEnter:Connect(function()
-        Tween(CloseBtn, {BackgroundColor3 = Color3.fromRGB(180, 50, 50)}, 0.1)
-    end)
-    CloseBtn.MouseLeave:Connect(function()
-        Tween(CloseBtn, {BackgroundColor3 = Theme.BackgroundLight}, 0.1)
-    end)
+    local function UpdateTheme()
+        Main.BackgroundColor3 = Theme.Background
+        MainStroke.Color = Theme.Border
+        TopBar.BackgroundColor3 = Theme.BackgroundDark
+        Sidebar.BackgroundColor3 = Theme.Sidebar
+    end
 
-    MinBtn.MouseButton1Click:Connect(function()
-        minimized = not minimized
-        if minimized then
-            Tween(Content, {Size = UDim2.new(0, 0, 0, 0)}, 0.2)
-            Tween(Sidebar, {Size = UDim2.new(0, 0, 0, 0)}, 0.2)
-            Tween(Main, {Size = UDim2.new(0, 350, 0, 48)}, 0.2)
+    local function SetTheme(themeName)
+        if ThemePresets[themeName] then
+            Theme = ThemePresets[themeName]
+            if cfg.Accent then
+                Theme.Accent = cfg.Accent
+            end
+            UpdateTheme()
+        end
+    end
+
+    local function Minimize()
+        minimized = true
+        Tween(Content, {Size = UDim2.new(0, 0, 0, 0)}, 0.2)
+        Tween(Sidebar, {Size = UDim2.new(0, 0, 0, 0)}, 0.2)
+        Tween(Main, {Size = UDim2.new(0, 350, 0, 48)}, 0.2)
+    end
+
+    local function Maximize()
+        maximized = not maximized
+        if maximized then
+            Tween(Main, {Size = UDim2.new(1, 0, 1, 0), Position = UDim2.new(0.5, 0, 0.5, 0)}, 0.3)
+            Tween(Content, {Size = UDim2.new(1, -20, 1, -60)}, 0.3)
+            Tween(Sidebar, {Size = UDim2.new(0, cfg.TabWidth, 1, -60)}, 0.3)
+            MaxBtn.Text = "❐"
         else
-            Tween(Sidebar, {Size = UDim2.new(0, cfg.TabWidth, 1, -52)}, 0.2)
-            Tween(Content, {Size = UDim2.new(1, -(cfg.TabWidth + 8), 1, -52)}, 0.2)
-            Tween(Main, {Size = cfg.Size}, 0.2)
+            Tween(Main, {Size = originalSize, Position = originalPos}, 0.3)
+            Tween(Sidebar, {Size = originalSidebarSize}, 0.3)
+            Tween(Content, {Size = originalContentSize}, 0.3)
+            MaxBtn.Text = "□"
+        end
+    end
+
+    local function Close()
+        Window.Running = false
+        Tween(Main, {Size = UDim2.new(0, 0, 0, 0)}, 0.25)
+        Tween(Main, {Position = UDim2.new(0.5, 0, 1.5, 0)}, 0.25)
+        task.delay(0.25, function()
+            ScreenGui:Destroy()
+        end)
+    end
+
+    MinBtn.MouseEnter:Connect(function() Tween(MinBtn, {BackgroundColor3 = Theme.CardHover}, 0.1) end)
+    MinBtn.MouseLeave:Connect(function() Tween(MinBtn, {BackgroundColor3 = Theme.BackgroundLight}, 0.1) end)
+    MaxBtn.MouseEnter:Connect(function() Tween(MaxBtn, {BackgroundColor3 = Theme.CardHover}, 0.1) end)
+    MaxBtn.MouseLeave:Connect(function() Tween(MaxBtn, {BackgroundColor3 = Theme.BackgroundLight}, 0.1) end)
+    CloseBtn.MouseEnter:Connect(function() Tween(CloseBtn, {BackgroundColor3 = Color3.fromRGB(180, 50, 50)}, 0.1) end)
+    CloseBtn.MouseLeave:Connect(function() Tween(CloseBtn, {BackgroundColor3 = Theme.BackgroundLight}, 0.1) end)
+
+    MinBtn.MouseButton1Click:Connect(Minimize)
+    MaxBtn.MouseButton1Click:Connect(Maximize)
+    CloseBtn.MouseButton1Click:Connect(Close)
+
+    UIS.InputBegan:Connect(function(input, processed)
+        if input.KeyCode == cfg.MinimizeKey and not processed then
+            if minimized then
+                minimized = false
+                Tween(Sidebar, {Size = originalSidebarSize}, 0.2)
+                Tween(Content, {Size = originalContentSize}, 0.2)
+                Tween(Main, {Size = originalSize}, 0.2)
+            else
+                Minimize()
+            end
+        end
+        if cfg.ToggleKey and input.KeyCode == cfg.ToggleKey and not processed then
+            Window:Toggle()
         end
     end)
 
-    CloseBtn.MouseButton1Click:Connect(function()
-        Tween(Main, {Size = UDim2.new(0, 0, 0, 0)}, 0.3)
-        Tween(Main, {Position = UDim2.new(0.5, 0, 1.5, 0)}, 0.3)
-        task.delay(0.3, function()
-            ScreenGui:Destroy()
-        end)
-    end)
-
-    Tween(Main, {Size = cfg.Size}, 0.35)
+    Tween(Main, {Size = cfg.Size}, 0.35, Enum.EasingStyle.Back)
 
     function Window:AddTab(config)
         local Tab = {}
@@ -430,7 +468,7 @@ function Phat:CreateWindow(config)
         Tab.Elements = {}
 
         local TabBtn = Create("TextButton", {
-            Size = UDim2.new(1, -8, 0, 42),
+            Size = UDim2.new(1, -8, 0, 44),
             Position = UDim2.new(0, 4, 0, 0),
             BackgroundColor3 = Theme.BackgroundLight,
             BorderSizePixel = 0,
@@ -441,11 +479,11 @@ function Phat:CreateWindow(config)
         })
         Create("UICorner", {CornerRadius = UDim.new(0, 10), Parent = TabBtn})
 
-        local TabIcon = Create("TextLabel", {
+        Create("TextLabel", {
             Size = UDim2.new(0, 24, 1, 0),
             Position = UDim2.new(0, 10, 0, 0),
             BackgroundTransparency = 1,
-            Text = config.Icon or "■",
+            Text = config.Icon or "●",
             TextColor3 = Theme.TextMuted,
             TextSize = 14,
             Font = Enum.Font.GothamBold,
@@ -453,7 +491,7 @@ function Phat:CreateWindow(config)
             ZIndex = 5,
         })
 
-        local TabLabel = Create("TextLabel", {
+        Create("TextLabel", {
             Size = UDim2.new(1, -44, 1, 0),
             Position = UDim2.new(0, 38, 0, 0),
             BackgroundTransparency = 1,
@@ -479,12 +517,12 @@ function Phat:CreateWindow(config)
             ZIndex = 2,
         })
 
-        Create("UIListLayout", {Padding = UDim.new(0, 14), Parent = TabContent})
+        Create("UIListLayout", {Padding = UDim.new(0, 16), Parent = TabContent})
         Create("UIPadding", {
             PaddingTop = UDim.new(0, 10),
             PaddingLeft = UDim.new(0, 10),
             PaddingRight = UDim.new(0, 10),
-            PaddingBottom = UDim.new(0, 10),
+            PaddingBottom = UDim.new(0, 20),
             Parent = TabContent,
         })
 
@@ -502,26 +540,34 @@ function Phat:CreateWindow(config)
         TabBtn.MouseButton1Click:Connect(function()
             if Window.CurrentTab then
                 Window.CurrentTab.Content.Visible = false
+                local children = Window.CurrentTab.Btn:GetChildren()
+                for _, c in ipairs(children) do
+                    if c:IsA("TextLabel") then
+                        c.TextColor3 = Theme.TextMuted
+                    end
+                end
                 Window.CurrentTab.Btn.BackgroundColor3 = Theme.BackgroundLight
-                Window.CurrentTab.Btn.Icon.TextColor3 = Theme.TextMuted
-                Window.CurrentTab.Btn.Label.TextColor3 = Theme.TextMuted
             end
             TabContent.Visible = true
             TabBtn.BackgroundColor3 = Theme.Accent
-            TabIcon.TextColor3 = Color3.new(1, 1, 1)
-            TabLabel.TextColor3 = Color3.new(1, 1, 1)
-            Window.CurrentTab = {Content = TabContent, Btn = TabBtn, Icon = TabIcon, Label = TabLabel}
+            for _, c in ipairs(TabBtn:GetChildren()) do
+                if c:IsA("TextLabel") then
+                    c.TextColor3 = Color3.new(1, 1, 1)
+                end
+            end
+            Window.CurrentTab = {Content = TabContent, Btn = TabBtn}
         end)
 
         Tab.Content = TabContent
         Tab.Btn = TabBtn
-        Tab.Icon = TabIcon
-        Tab.Label = TabLabel
 
-        function Tab:AddSection(name)
+        function Tab:AddSection(name, config)
             local Section = {}
             Section.Name = name or "Section"
             Section.Elements = {}
+
+            local collapsed = config and config.Collapsible
+            local isCollapsed = false
 
             local SectionFrame = Create("Frame", {
                 Size = UDim2.new(1, 0, 0, 0),
@@ -535,14 +581,14 @@ function Phat:CreateWindow(config)
             Create("UIStroke", {Color = Theme.Border, Thickness = 1, Parent = SectionFrame})
 
             local SectionHeader = Create("Frame", {
-                Size = UDim2.new(1, 0, 0, 32),
+                Size = UDim2.new(1, 0, 0, 36),
                 BackgroundTransparency = 1,
                 Parent = SectionFrame,
                 ZIndex = 3,
             })
 
             Create("TextLabel", {
-                Size = UDim2.new(1, -24, 1, 0),
+                Size = UDim2.new(1, -30, 1, 0),
                 BackgroundTransparency = 1,
                 Text = Section.Name,
                 TextColor3 = Theme.Text,
@@ -566,19 +612,46 @@ function Phat:CreateWindow(config)
                 ZIndex = 3,
             })
 
-            Create("UIListLayout", {Padding = UDim.new(0, 6), Parent = SectionFrame})
+            if collapsed then
+                local collapseBtn = Create("TextButton", {
+                    Size = UDim2.new(1, 0, 0, 36),
+                    BackgroundTransparency = 1,
+                    Text = "",
+                    Parent = SectionHeader,
+                    ZIndex = 4,
+                })
+                collapseBtn.MouseButton1Click:Connect(function()
+                    isCollapsed = not isCollapsed
+                    for _, c in ipairs(SectionFrame:GetChildren()) do
+                        if c ~= SectionHeader and c:IsA("Frame") then
+                            c.Visible = not isCollapsed
+                        end
+                    end
+                end)
+            end
+
+            local ContentFrame = Create("Frame", {
+                Size = UDim2.new(1, 0, 0, 0),
+                BackgroundTransparency = 1,
+                Parent = SectionFrame,
+                ZIndex = 3,
+                AutomaticSize = Enum.AutomaticSize.Y,
+            })
+
+            Create("UIListLayout", {Padding = UDim.new(0, 8), Parent = ContentFrame})
             Create("UIPadding", {
-                PaddingTop = UDim.new(0, 12),
+                PaddingTop = UDim.new(0, 8),
                 PaddingLeft = UDim.new(0, 14),
                 PaddingRight = UDim.new(0, 14),
-                PaddingBottom = UDim.new(0, 12),
-                Parent = SectionFrame,
+                PaddingBottom = UDim.new(0, 14),
+                Parent = ContentFrame,
             })
 
             Section.Container = SectionFrame
+            Section.Content = ContentFrame
 
             function Section:AddLabel(cfg)
-                local Label = Create("TextLabel", {
+                return Create("TextLabel", {
                     Size = UDim2.new(1, 0, 0, 24),
                     BackgroundTransparency = 1,
                     Text = cfg.Text or "",
@@ -586,26 +659,62 @@ function Phat:CreateWindow(config)
                     TextXAlignment = Enum.TextXAlignment.Left,
                     TextSize = cfg.TextSize or 13,
                     Font = cfg.Font or Enum.Font.Gotham,
-                    Parent = SectionFrame,
+                    Parent = ContentFrame,
                     ZIndex = 3,
+                    TextTruncate = cfg.Truncate,
                 })
-                return Label
             end
 
             function Section:AddButton(cfg)
                 local btn = Create("TextButton", {
-                    Size = UDim2.new(1, 0, 0, 42),
+                    Size = UDim2.new(1, 0, 0, 44),
                     BackgroundColor3 = Theme.BackgroundLight,
                     BorderSizePixel = 0,
-                    Text = cfg.Title or "Button",
-                    TextColor3 = Theme.Text,
-                    TextSize = 14,
-                    Font = Enum.Font.GothamBold,
-                    Parent = SectionFrame,
-                    ZIndex = 3,
+                    Text = "",
                     AutoButtonColor = false,
+                    Parent = ContentFrame,
+                    ZIndex = 3,
                 })
                 Create("UICorner", {CornerRadius = UDim.new(0, 10), Parent = btn})
+
+                if cfg.Icon then
+                    Create("TextLabel", {
+                        Size = UDim2.new(0, 24, 0, 24),
+                        Position = UDim2.new(0, 12, 0.5, 0),
+                        AnchorPoint = Vector2.new(0, 0.5),
+                        BackgroundTransparency = 1,
+                        Text = cfg.Icon,
+                        TextColor3 = cfg.IconColor or Theme.Accent,
+                        TextSize = 16,
+                        Font = Enum.Font.GothamBold,
+                        Parent = btn,
+                        ZIndex = 4,
+                    })
+                    Create("TextLabel", {
+                        Size = UDim2.new(1, -50, 1, 0),
+                        Position = UDim2.new(0, 44, 0, 0),
+                        BackgroundTransparency = 1,
+                        Text = cfg.Title or "Button",
+                        TextColor3 = Theme.Text,
+                        TextSize = 14,
+                        Font = Enum.Font.GothamBold,
+                        Parent = btn,
+                        ZIndex = 4,
+                    })
+                else
+                    Create("TextLabel", {
+                        Size = UDim2.new(1, -16, 1, 0),
+                        Position = UDim2.new(0.5, 0, 0.5, 0),
+                        AnchorPoint = Vector2.new(0.5, 0.5),
+                        BackgroundTransparency = 1,
+                        Text = cfg.Title or "Button",
+                        TextColor3 = Theme.Text,
+                        TextSize = 14,
+                        Font = Enum.Font.GothamBold,
+                        Parent = btn,
+                        ZIndex = 4,
+                    })
+                end
 
                 btn.MouseEnter:Connect(function()
                     Tween(btn, {BackgroundColor3 = Theme.CardHover}, 0.1)
@@ -614,7 +723,9 @@ function Phat:CreateWindow(config)
                     Tween(btn, {BackgroundColor3 = Theme.BackgroundLight}, 0.1)
                 end)
                 btn.MouseButton1Click:Connect(function()
-                    pcall(cfg.Callback)
+                    if cfg.Callback then
+                        pcall(cfg.Callback)
+                    end
                 end)
 
                 return btn
@@ -623,23 +734,31 @@ function Phat:CreateWindow(config)
             function Section:AddToggle(cfg)
                 local Toggle = {}
                 local state = cfg.Default or false
-                Window.Flags[cfg.Flag] = state
+                local flag = cfg.Flag
+
+                if flag then
+                    if cfg.getgenv then
+                        getgenv()[flag] = state
+                    else
+                        Window.Flags[flag] = state
+                    end
+                end
 
                 local ToggleFrame = Create("Frame", {
-                    Size = UDim2.new(1, 0, 0, 46),
+                    Size = UDim2.new(1, 0, 0, 48),
                     BackgroundTransparency = 1,
-                    Parent = SectionFrame,
+                    Parent = ContentFrame,
                     ZIndex = 3,
                 })
 
                 local ToggleContent = Create("Frame", {
-                    Size = UDim2.new(1, -58, 1, 0),
+                    Size = UDim2.new(1, -60, 1, 0),
                     BackgroundTransparency = 1,
                     Parent = ToggleFrame,
                     ZIndex = 4,
                 })
 
-                Create("TextLabel", {
+                local Label = Create("TextLabel", {
                     Size = UDim2.new(1, 0, 0, 22),
                     BackgroundTransparency = 1,
                     Text = cfg.Title or "Toggle",
@@ -652,9 +771,10 @@ function Phat:CreateWindow(config)
                 })
 
                 if cfg.Description then
+                    Label.Size = UDim2.new(1, 0, 0, 18)
                     Create("TextLabel", {
                         Size = UDim2.new(1, 0, 0, 16),
-                        Position = UDim2.new(0, 0, 0, 20),
+                        Position = UDim2.new(0, 0, 0, 18),
                         BackgroundTransparency = 1,
                         Text = cfg.Description,
                         TextColor3 = Theme.TextMuted,
@@ -667,7 +787,7 @@ function Phat:CreateWindow(config)
                 end
 
                 local ToggleBox = Create("TextButton", {
-                    Size = UDim2.new(0, 50, 0, 28),
+                    Size = UDim2.new(0, 52, 0, 30),
                     Position = UDim2.new(1, 0, 0.5, 0),
                     AnchorPoint = Vector2.new(1, 0.5),
                     BackgroundColor3 = Theme.Toggle,
@@ -680,20 +800,26 @@ function Phat:CreateWindow(config)
                 Create("UICorner", {CornerRadius = UDim.new(0, 8), Parent = ToggleBox})
 
                 local ToggleKnob = Create("Frame", {
-                    Size = UDim2.new(0, 20, 0, 20),
-                    Position = state and UDim2.new(1, -6, 0.5, 0) or UDim2.new(0, 6, 0.5, 0),
+                    Size = UDim2.new(0, 22, 0, 22),
+                    Position = state and UDim2.new(1, -7, 0.5, 0) or UDim2.new(0, 7, 0.5, 0),
                     AnchorPoint = Vector2.new(0, 0.5),
                     BackgroundColor3 = Color3.new(1, 1, 1),
                     BorderSizePixel = 0,
                     Parent = ToggleBox,
                     ZIndex = 6,
                 })
-                Create("UICorner", {CornerRadius = UDim.new(0, 7), Parent = ToggleKnob})
+                Create("UICorner", {CornerRadius = UDim.new(0, 8), Parent = ToggleKnob})
 
                 local function update(animate)
-                    Window.Flags[cfg.Flag] = state
+                    if flag then
+                        if cfg.getgenv then
+                            getgenv()[flag] = state
+                        else
+                            Window.Flags[flag] = state
+                        end
+                    end
                     local targetColor = state and Theme.Accent or Theme.Toggle
-                    local targetPos = state and UDim2.new(1, -6, 0.5, 0) or UDim2.new(0, 6, 0.5, 0)
+                    local targetPos = state and UDim2.new(1, -7, 0.5, 0) or UDim2.new(0, 7, 0.5, 0)
                     if animate then
                         Tween(ToggleBox, {BackgroundColor3 = targetColor}, 0.2)
                         Tween(ToggleKnob, {Position = targetPos}, 0.2)
@@ -707,7 +833,9 @@ function Phat:CreateWindow(config)
                 ToggleBox.MouseButton1Click:Connect(function()
                     state = not state
                     update(true)
-                    pcall(cfg.Callback, state)
+                    if cfg.Callback then
+                        pcall(cfg.Callback, state)
+                    end
                 end)
 
                 function Toggle:Set(val)
@@ -717,27 +845,33 @@ function Phat:CreateWindow(config)
                 function Toggle:Get()
                     return state
                 end
+                function Toggle:Destroy()
+                    ToggleFrame:Destroy()
+                end
 
                 return Toggle
             end
 
             function Section:AddSlider(cfg)
                 local Slider = {}
-                local min = cfg.Min or 0
-                local max = cfg.Max or 100
+                local min, max = cfg.Min or 0, cfg.Max or 100
                 local value = cfg.Default or min
                 local step = cfg.Step or 1
-                Window.Flags[cfg.Flag] = value
+                local flag = cfg.Flag
+
+                if flag then
+                    Window.Flags[flag] = value
+                end
 
                 local SliderFrame = Create("Frame", {
-                    Size = UDim2.new(1, 0, 0, 64),
+                    Size = UDim2.new(1, 0, 0, 68),
                     BackgroundTransparency = 1,
-                    Parent = SectionFrame,
+                    Parent = ContentFrame,
                     ZIndex = 3,
                 })
 
                 local SliderHeader = Create("Frame", {
-                    Size = UDim2.new(1, -56, 0, 22),
+                    Size = UDim2.new(1, -60, 0, 22),
                     BackgroundTransparency = 1,
                     Parent = SliderFrame,
                     ZIndex = 4,
@@ -756,7 +890,7 @@ function Phat:CreateWindow(config)
                 })
 
                 local SliderValue = Create("TextBox", {
-                    Size = UDim2.new(0, 50, 1, 0),
+                    Size = UDim2.new(0, 54, 1, 0),
                     Position = UDim2.new(1, 0, 0, 0),
                     AnchorPoint = Vector2.new(1, 0),
                     BackgroundColor3 = Theme.BackgroundDark,
@@ -771,14 +905,14 @@ function Phat:CreateWindow(config)
                 Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = SliderValue})
 
                 local SliderTrack = Create("Frame", {
-                    Size = UDim2.new(1, 0, 0, 8),
-                    Position = UDim2.new(0, 0, 0, 34),
+                    Size = UDim2.new(1, 0, 0, 10),
+                    Position = UDim2.new(0, 0, 0, 36),
                     BackgroundColor3 = Theme.Toggle,
                     BorderSizePixel = 0,
                     Parent = SliderFrame,
                     ZIndex = 5,
                 })
-                Create("UICorner", {CornerRadius = UDim.new(0, 4), Parent = SliderTrack})
+                Create("UICorner", {CornerRadius = UDim.new(0, 5), Parent = SliderTrack})
 
                 local SliderFill = Create("Frame", {
                     Size = UDim2.new(math.max(0, (value - min) / (max - min)), 0, 1, 0),
@@ -787,27 +921,41 @@ function Phat:CreateWindow(config)
                     Parent = SliderTrack,
                     ZIndex = 6,
                 })
-                Create("UICorner", {CornerRadius = UDim.new(0, 4), Parent = SliderFill})
+                Create("UICorner", {CornerRadius = UDim.new(0, 5), Parent = SliderFill})
 
                 local SliderKnob = Create("Frame", {
-                    Size = UDim2.new(0, 20, 0, 20),
-                    Position = UDim2.new(math.max(0, (value - min) / (max - min)), -10, 0.5, 0),
+                    Size = UDim2.new(0, 22, 0, 22),
+                    Position = UDim2.new(math.max(0, (value - min) / (max - min)), -11, 0.5, 0),
                     AnchorPoint = Vector2.new(0.5, 0.5),
                     BackgroundColor3 = Color3.new(1, 1, 1),
                     BorderSizePixel = 0,
                     Parent = SliderTrack,
                     ZIndex = 7,
                 })
-                Create("UICorner", {CornerRadius = UDim.new(0, 7), Parent = SliderKnob})
+                Create("UICorner", {CornerRadius = UDim.new(0, 8), Parent = SliderKnob})
                 Create("UIStroke", {Color = Theme.Accent, Thickness = 2, Parent = SliderKnob})
+
+                if cfg.Suffix then
+                    Create("TextLabel", {
+                        Size = UDim2.new(0, 30, 0, 16),
+                        Position = UDim2.new(1, -54, 0, 40),
+                        AnchorPoint = Vector2.new(1, 0),
+                        BackgroundTransparency = 1,
+                        Text = cfg.Suffix,
+                        TextColor3 = Theme.TextMuted,
+                        TextSize = 11,
+                        Font = Enum.Font.Gotham,
+                        Parent = SliderFrame,
+                        ZIndex = 4,
+                    })
+                end
 
                 local dragging = false
                 local function updateSlider(input)
-                    local rel = (input.Position.X - SliderTrack.AbsolutePosition.X) / SliderTrack.AbsoluteSize.X
-                    rel = math.clamp(rel, 0, 1)
+                    local rel = math.clamp((input.Position.X - SliderTrack.AbsolutePosition.X) / SliderTrack.AbsoluteSize.X, 0, 1)
                     value = math.floor(min + (max - min) * rel + 0.5)
                     value = math.max(min, math.min(max, value))
-                    Window.Flags[cfg.Flag] = value
+                    if flag then Window.Flags[flag] = value end
                     local pct = (value - min) / (max - min)
                     SliderFill.Size = UDim2.new(pct, 0, 1, 0)
                     SliderKnob.Position = UDim2.new(pct, 0, 0.5, 0)
@@ -824,7 +972,7 @@ function Phat:CreateWindow(config)
                 UIS.InputChanged:Connect(function(input)
                     if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
                         updateSlider(input)
-                        pcall(cfg.Callback, value)
+                        if cfg.Callback then pcall(cfg.Callback, value) end
                     end
                 end)
 
@@ -842,7 +990,7 @@ function Phat:CreateWindow(config)
                         SliderFill.Size = UDim2.new(pct, 0, 1, 0)
                         SliderKnob.Position = UDim2.new(pct, 0, 0.5, 0)
                         SliderValue.Text = tostring(value)
-                        Window.Flags[cfg.Flag] = value
+                        if flag then Window.Flags[flag] = value end
                     else
                         SliderValue.Text = tostring(value)
                     end
@@ -850,15 +998,14 @@ function Phat:CreateWindow(config)
 
                 function Slider:Set(val)
                     value = math.max(min, math.min(max, val))
-                    Window.Flags[cfg.Flag] = value
+                    if flag then Window.Flags[flag] = value end
                     local pct = (value - min) / (max - min)
                     Tween(SliderFill, {Size = UDim2.new(pct, 0, 1, 0)}, 0.1)
                     Tween(SliderKnob, {Position = UDim2.new(pct, 0, 0.5, 0)}, 0.1)
                     SliderValue.Text = tostring(value)
                 end
-                function Slider:Get()
-                    return value
-                end
+                function Slider:Get() return value end
+                function Slider:Destroy() SliderFrame:Destroy() end
 
                 return Slider
             end
@@ -868,17 +1015,19 @@ function Phat:CreateWindow(config)
                 local items = cfg.Items or {}
                 local selected = cfg.Default or nil
                 local open = false
-                Window.Flags[cfg.Flag] = selected
+                local flag = cfg.Flag
+
+                if flag then Window.Flags[flag] = selected end
 
                 local DropdownFrame = Create("Frame", {
-                    Size = UDim2.new(1, 0, 0, 46),
+                    Size = UDim2.new(1, 0, 0, 48),
                     BackgroundTransparency = 1,
-                    Parent = SectionFrame,
+                    Parent = ContentFrame,
                     ZIndex = 3,
                 })
 
                 local DropdownContent = Create("Frame", {
-                    Size = UDim2.new(1, -46, 1, 0),
+                    Size = UDim2.new(1, -48, 1, 0),
                     BackgroundTransparency = 1,
                     Parent = DropdownFrame,
                     ZIndex = 4,
@@ -910,7 +1059,7 @@ function Phat:CreateWindow(config)
                 })
 
                 local DropdownBtn = Create("TextButton", {
-                    Size = UDim2.new(0, 40, 0, 40),
+                    Size = UDim2.new(0, 42, 0, 42),
                     Position = UDim2.new(1, 0, 0.5, 0),
                     AnchorPoint = Vector2.new(1, 0.5),
                     BackgroundColor3 = Theme.BackgroundLight,
@@ -927,7 +1076,7 @@ function Phat:CreateWindow(config)
 
                 local DropdownList = Create("Frame", {
                     Size = UDim2.new(1, 0, 0, 0),
-                    Position = UDim2.new(0, 0, 0, 50),
+                    Position = UDim2.new(0, 0, 0, 52),
                     BackgroundColor3 = Theme.Card,
                     BorderSizePixel = 0,
                     Visible = false,
@@ -955,7 +1104,7 @@ function Phat:CreateWindow(config)
                     open = not open
                     DropdownList.Visible = open
                     if open then
-                        local h = math.min(#items * 34 + 8, 220)
+                        local h = math.min(#items * 36 + 8, 240)
                         Tween(DropdownList, {Size = UDim2.new(1, 0, 0, h)}, 0.2, Enum.EasingStyle.Back)
                         Tween(DropdownBtn, {Rotation = 180}, 0.2)
                     else
@@ -966,7 +1115,7 @@ function Phat:CreateWindow(config)
 
                 local function addItem(item, idx)
                     local itemBtn = Create("TextButton", {
-                        Size = UDim2.new(1, 0, 0, 30),
+                        Size = UDim2.new(1, 0, 0, 32),
                         BackgroundTransparency = 1,
                         Text = item,
                         TextColor3 = Theme.Text,
@@ -977,7 +1126,7 @@ function Phat:CreateWindow(config)
                         ZIndex = 12,
                         AutoButtonColor = false,
                     })
-                    Create("UIPadding", {PaddingLeft = UDim.new(0, 10), Parent = itemBtn})
+                    Create("UIPadding", {PaddingLeft = UDim.new(0, 12), Parent = itemBtn})
 
                     itemBtn.MouseEnter:Connect(function()
                         Tween(itemBtn, {BackgroundColor3 = Theme.CardHover}, 0.1)
@@ -988,7 +1137,7 @@ function Phat:CreateWindow(config)
 
                     itemBtn.MouseButton1Click:Connect(function()
                         selected = item
-                        Window.Flags[cfg.Flag] = item
+                        if flag then Window.Flags[flag] = item end
                         DropdownValue.Text = item
                         DropdownValue.TextColor3 = Theme.Text
                         open = false
@@ -997,7 +1146,7 @@ function Phat:CreateWindow(config)
                         task.delay(0.15, function()
                             DropdownList.Visible = false
                         end)
-                        pcall(cfg.Callback, item, idx)
+                        if cfg.Callback then pcall(cfg.Callback, item, idx) end
                     end)
                 end
 
@@ -1012,34 +1161,34 @@ function Phat:CreateWindow(config)
                 function Dropdown:Clear()
                     items = {}
                     selected = nil
-                    Window.Flags[cfg.Flag] = nil
+                    if flag then Window.Flags[flag] = nil end
                     DropdownValue.Text = "Select..."
                     DropdownValue.TextColor3 = Theme.TextMuted
                     for _, c in ipairs(DropdownScroll:GetChildren()) do
                         if c:IsA("TextButton") then c:Destroy() end
                     end
                 end
-                function Dropdown:Get()
-                    return selected
-                end
+                function Dropdown:Get() return selected end
                 function Dropdown:Set(val)
                     selected = val
-                    Window.Flags[cfg.Flag] = val
+                    if flag then Window.Flags[flag] = val end
                     DropdownValue.Text = val or "Select..."
                     DropdownValue.TextColor3 = val and Theme.Text or Theme.TextMuted
                 end
+                function Dropdown:Destroy() DropdownFrame:Destroy() end
 
                 return Dropdown
             end
 
             function Section:AddInput(cfg)
                 local Input = {}
-                Window.Flags[cfg.Flag] = cfg.Default or ""
+                local flag = cfg.Flag
+                if flag then Window.Flags[flag] = cfg.Default or "" end
 
                 local InputFrame = Create("Frame", {
-                    Size = UDim2.new(1, 0, 0, 46),
+                    Size = UDim2.new(1, 0, 0, 48),
                     BackgroundTransparency = 1,
-                    Parent = SectionFrame,
+                    Parent = ContentFrame,
                     ZIndex = 3,
                 })
 
@@ -1063,7 +1212,7 @@ function Phat:CreateWindow(config)
                 })
 
                 local InputBox = Create("TextBox", {
-                    Size = UDim2.new(1, 0, 0, 30),
+                    Size = UDim2.new(1, 0, 0, 32),
                     Position = UDim2.new(0, 0, 0, 22),
                     BackgroundColor3 = Theme.BackgroundDark,
                     BorderSizePixel = 0,
@@ -1085,7 +1234,7 @@ function Phat:CreateWindow(config)
                 })
 
                 local ClearBtn = Create("TextButton", {
-                    Size = UDim2.new(0, 40, 0, 40),
+                    Size = UDim2.new(0, 42, 0, 42),
                     Position = UDim2.new(1, 0, 0.5, 0),
                     AnchorPoint = Vector2.new(1, 0.5),
                     BackgroundColor3 = Theme.BackgroundLight,
@@ -1109,8 +1258,8 @@ function Phat:CreateWindow(config)
                 InputBox.FocusLost:Connect(function()
                     Tween(InputStroke, {Thickness = 0}, 0.15)
                     ClearBtn.Visible = false
-                    Window.Flags[cfg.Flag] = InputBox.Text
-                    pcall(cfg.Callback, InputBox.Text)
+                    if flag then Window.Flags[flag] = InputBox.Text end
+                    if cfg.Callback then pcall(cfg.Callback, InputBox.Text) end
                 end)
 
                 InputBox:GetPropertyChangedSignal("Text"):Connect(function()
@@ -1120,17 +1269,16 @@ function Phat:CreateWindow(config)
                 ClearBtn.MouseButton1Click:Connect(function()
                     InputBox.Text = ""
                     ClearBtn.Visible = false
-                    Window.Flags[cfg.Flag] = ""
-                    pcall(cfg.Callback, "")
+                    if flag then Window.Flags[flag] = "" end
+                    if cfg.Callback then pcall(cfg.Callback, "") end
                 end)
 
-                function Input:Get()
-                    return InputBox.Text
-                end
+                function Input:Get() return InputBox.Text end
                 function Input:Set(text)
                     InputBox.Text = text
-                    Window.Flags[cfg.Flag] = text
+                    if flag then Window.Flags[flag] = text end
                 end
+                function Input:Destroy() InputFrame:Destroy() end
 
                 return Input
             end
@@ -1138,12 +1286,13 @@ function Phat:CreateWindow(config)
             function Section:AddKeybind(cfg)
                 local Keybind = {}
                 local currentKey = cfg.Default or Enum.KeyCode.Unknown
-                Window.Flags[cfg.Flag] = currentKey
+                local flag = cfg.Flag
+                if flag then Window.Flags[flag] = currentKey end
 
                 local KeybindFrame = Create("Frame", {
-                    Size = UDim2.new(1, 0, 0, 46),
+                    Size = UDim2.new(1, 0, 0, 48),
                     BackgroundTransparency = 1,
-                    Parent = SectionFrame,
+                    Parent = ContentFrame,
                     ZIndex = 3,
                 })
 
@@ -1182,7 +1331,7 @@ function Phat:CreateWindow(config)
                 end
 
                 local KeybindBtn = Create("TextButton", {
-                    Size = UDim2.new(0, 100, 0, 36),
+                    Size = UDim2.new(0, 100, 0, 38),
                     Position = UDim2.new(1, 0, 0.5, 0),
                     AnchorPoint = Vector2.new(1, 0.5),
                     BackgroundColor3 = Theme.BackgroundLight,
@@ -1209,24 +1358,23 @@ function Phat:CreateWindow(config)
                     if binding then
                         if input.KeyCode ~= Enum.KeyCode.Unknown then
                             currentKey = input.KeyCode
-                            Window.Flags[cfg.Flag] = currentKey
+                            if flag then Window.Flags[flag] = currentKey end
                             KeybindBtn.Text = currentKey.Name
                             Tween(KeybindBtn, {BackgroundColor3 = Theme.BackgroundLight}, 0.1)
                             binding = false
                         end
                     elseif input.KeyCode == currentKey and not processed then
-                        pcall(cfg.Callback)
+                        if cfg.Callback then pcall(cfg.Callback) end
                     end
                 end)
 
                 function Keybind:Set(key)
                     currentKey = key
-                    Window.Flags[cfg.Flag] = key
+                    if flag then Window.Flags[flag] = key end
                     KeybindBtn.Text = key.Name or "None"
                 end
-                function Keybind:Get()
-                    return currentKey
-                end
+                function Keybind:Get() return currentKey end
+                function Keybind:Destroy() KeybindFrame:Destroy() end
 
                 return Keybind
             end
@@ -1234,17 +1382,18 @@ function Phat:CreateWindow(config)
             function Section:AddColorPicker(cfg)
                 local Picker = {}
                 local color = cfg.Default or Color3.fromRGB(255, 255, 255)
-                Window.Flags[cfg.Flag] = color
+                local flag = cfg.Flag
+                if flag then Window.Flags[flag] = color end
 
                 local PickerFrame = Create("Frame", {
-                    Size = UDim2.new(1, 0, 0, 56),
+                    Size = UDim2.new(1, 0, 0, 58),
                     BackgroundTransparency = 1,
-                    Parent = SectionFrame,
+                    Parent = ContentFrame,
                     ZIndex = 3,
                 })
 
                 Create("TextLabel", {
-                    Size = UDim2.new(1, -56, 0, 22),
+                    Size = UDim2.new(1, -58, 0, 22),
                     BackgroundTransparency = 1,
                     Text = cfg.Title or "Color",
                     TextColor3 = Theme.Text,
@@ -1256,7 +1405,7 @@ function Phat:CreateWindow(config)
                 })
 
                 local ColorPreview = Create("Frame", {
-                    Size = UDim2.new(0, 44, 0, 28),
+                    Size = UDim2.new(0, 48, 0, 30),
                     Position = UDim2.new(0, 0, 0, 26),
                     BackgroundColor3 = color,
                     BorderSizePixel = 0,
@@ -1266,8 +1415,8 @@ function Phat:CreateWindow(config)
                 Create("UICorner", {CornerRadius = UDim.new(0, 6), Parent = ColorPreview})
 
                 local HexBox = Create("TextBox", {
-                    Size = UDim2.new(1, -56, 1, 0),
-                    Position = UDim2.new(0, 50, 0, 26),
+                    Size = UDim2.new(1, -60, 1, 0),
+                    Position = UDim2.new(0, 54, 0, 26),
                     BackgroundColor3 = Theme.BackgroundDark,
                     BorderSizePixel = 0,
                     Text = "#" .. color:ToHex(),
@@ -1281,34 +1430,71 @@ function Phat:CreateWindow(config)
 
                 function Picker:Set(c)
                     color = c
-                    Window.Flags[cfg.Flag] = c
+                    if flag then Window.Flags[flag] = c end
                     ColorPreview.BackgroundColor3 = c
                     HexBox.Text = "#" .. c:ToHex()
                 end
-                function Picker:Get()
-                    return color
-                end
+                function Picker:Get() return color end
+                function Picker:Destroy() PickerFrame:Destroy() end
 
                 return Picker
             end
 
-            function Section:AddDivider(cfg)
+            function Section:AddLine(cfg)
                 Create("Frame", {
-                    Size = UDim2.new(1, 0, 0, cfg and cfg.Height or 18),
+                    Size = UDim2.new(1, 0, 0, cfg and cfg.Height or 1),
                     BackgroundTransparency = 1,
-                    Parent = SectionFrame,
+                    Parent = ContentFrame,
                     ZIndex = 3,
                 })
+                if cfg and cfg.Line then
+                    Create("Frame", {
+                        Size = UDim2.new(1, 0, 0, 1),
+                        Position = UDim2.new(0, 0, 0.5, 0),
+                        BackgroundColor3 = Theme.Border,
+                        BorderSizePixel = 0,
+                        Parent = ContentFrame,
+                        ZIndex = 4,
+                    })
+                end
             end
 
-            function Section:AddSeparator()
-                Create("Frame", {
-                    Size = UDim2.new(1, 0, 0, 1),
-                    BackgroundColor3 = Theme.Border,
-                    BorderSizePixel = 0,
-                    Parent = SectionFrame,
+            function Section:AddParagraph(cfg)
+                local ParagraphFrame = Create("Frame", {
+                    Size = UDim2.new(1, 0, 0, 0),
+                    BackgroundTransparency = 1,
+                    Parent = ContentFrame,
+                    ZIndex = 3,
+                    AutomaticSize = Enum.AutomaticSize.Y,
+                })
+
+                Create("TextLabel", {
+                    Size = UDim2.new(1, 0, 0, 20),
+                    BackgroundTransparency = 1,
+                    Text = cfg.Title or "",
+                    TextColor3 = Theme.Text,
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    TextSize = 14,
+                    Font = Enum.Font.GothamBold,
+                    Parent = ParagraphFrame,
                     ZIndex = 3,
                 })
+
+                Create("TextLabel", {
+                    Size = UDim2.new(1, 0, 0, 0),
+                    BackgroundTransparency = 1,
+                    Text = cfg.Text or "",
+                    TextColor3 = Theme.TextMuted,
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    TextSize = 12,
+                    Font = Enum.Font.Gotham,
+                    TextWrapped = true,
+                    Parent = ParagraphFrame,
+                    ZIndex = 3,
+                    AutomaticSize = Enum.AutomaticSize.Y,
+                })
+
+                return ParagraphFrame
             end
 
             return Section
@@ -1319,10 +1505,13 @@ function Phat:CreateWindow(config)
 
         if #Window.Tabs == 1 then
             TabBtn.BackgroundColor3 = Theme.Accent
-            TabIcon.TextColor3 = Color3.new(1, 1, 1)
-            TabLabel.TextColor3 = Color3.new(1, 1, 1)
+            for _, c in ipairs(TabBtn:GetChildren()) do
+                if c:IsA("TextLabel") then
+                    c.TextColor3 = Color3.new(1, 1, 1)
+                end
+            end
             TabContent.Visible = true
-            Window.CurrentTab = {Content = TabContent, Btn = TabBtn, Icon = TabIcon, Label = TabLabel}
+            Window.CurrentTab = {Content = TabContent, Btn = TabBtn}
         end
 
         return Tab
@@ -1352,20 +1541,20 @@ function Phat:CreateWindow(config)
         end
 
         Create("TextLabel", {
-            Size = UDim2.new(0, 30, 0, 30),
+            Size = UDim2.new(0, 32, 0, 32),
             Position = UDim2.new(0, 12, 0, 12),
             BackgroundTransparency = 1,
             Text = iconTxt,
             TextColor3 = strokeColor,
-            TextSize = 18,
+            TextSize = 20,
             Font = Enum.Font.GothamBold,
             Parent = notif,
             ZIndex = 16,
         })
 
         Create("TextLabel", {
-            Size = UDim2.new(1, -50, 0, 20),
-            Position = UDim2.new(0, 48, 0, 12),
+            Size = UDim2.new(1, -52, 0, 20),
+            Position = UDim2.new(0, 50, 0, 12),
             BackgroundTransparency = 1,
             Text = cfg.Title or "Notification",
             TextColor3 = Theme.Text,
@@ -1377,8 +1566,8 @@ function Phat:CreateWindow(config)
         })
 
         Create("TextLabel", {
-            Size = UDim2.new(1, -50, 0, 28),
-            Position = UDim2.new(0, 48, 0, 32),
+            Size = UDim2.new(1, -52, 0, 28),
+            Position = UDim2.new(0, 50, 0, 32),
             BackgroundTransparency = 1,
             Text = cfg.Description or "",
             TextColor3 = Theme.TextMuted,
@@ -1390,9 +1579,9 @@ function Phat:CreateWindow(config)
             ZIndex = 16,
         })
 
-        Tween(notif, {Size = UDim2.new(1, 0, 0, 72)}, 0.25, Enum.EasingStyle.Back)
+        Tween(notif, {Size = UDim2.new(1, 0, 0, 76)}, 0.25, Enum.EasingStyle.Back)
 
-        task.delay(cfg.Duration or 3, function()
+        task.delay(cfg.Duration or 4, function()
             if notif and notif.Parent then
                 Tween(notif, {Size = UDim2.new(1, 0, 0, 0), BackgroundTransparency = 1}, 0.2)
                 for _, c in ipairs(notif:GetChildren()) do
@@ -1405,6 +1594,8 @@ function Phat:CreateWindow(config)
                 end)
             end
         end)
+
+        return notif
     end
 
     function Window:SelectTab(name)
@@ -1416,8 +1607,44 @@ function Phat:CreateWindow(config)
         end
     end
 
+    function Window:Toggle()
+        minimized = not minimized
+        if minimized then
+            Minimize()
+        else
+            Tween(Sidebar, {Size = originalSidebarSize}, 0.2)
+            Tween(Content, {Size = originalContentSize}, 0.2)
+            Tween(Main, {Size = originalSize}, 0.2)
+        end
+    end
+
+    function Window:SetTheme(themeName)
+        SetTheme(themeName)
+    end
+
+    function Window:Minimize()
+        Minimize()
+    end
+
+    function Window:Maximize()
+        Maximize()
+    end
+
+    function Window:Close()
+        Close()
+    end
+
+    function Window:GetFlags()
+        return Window.Flags
+    end
+
+    function Window:IsRunning()
+        return Window.Running
+    end
+
     Window.Main = Main
     Window.ScreenGui = ScreenGui
+    Window.Theme = Theme
     return Window
 end
 
