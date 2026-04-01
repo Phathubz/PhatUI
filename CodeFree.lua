@@ -551,7 +551,7 @@ function Phat:CreateWindow(cfg)
         TBtn.Name = "Tab" .. mi
         TBtn.Size = UDim2.new(1, -8, 0, 46)
         TBtn.Position = UDim2.new(0, 4, 0, 0)
-        -- TBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        TBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
         TBtn.BackgroundTransparency = 1
         TBtn.Text = ""
         TBtn.BorderSizePixel = 0
