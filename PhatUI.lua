@@ -366,9 +366,12 @@ function Phat:CreateWindow(cfg)
 
         hitbox.InputBegan:Connect(function(i)
             if i.UserInputType == Enum.UserInputType.MouseButton1 then
-                dragging = true
-                startPos = i.Position
-                startMainPos = Main.Position
+                resizing = {
+                    edge = name,
+                    startPos = i.Position,
+                    startSize = Main.Size,
+                    startPosUDim = Main.Position
+                }
             end
         end)
         hitbox.InputEnded:Connect(function(i)
@@ -387,7 +390,46 @@ function Phat:CreateWindow(cfg)
     createEdgeHitbox("Bottom", UDim2.new(0, 0, 1, -EDGE_SIZE), UDim2.new(1, 0, 0, EDGE_SIZE))
     createEdgeHitbox("Left", UDim2.new(0, 0, 0, 0), UDim2.new(0, EDGE_SIZE, 1, 0))
     createEdgeHitbox("Right", UDim2.new(1, -EDGE_SIZE, 0, 0), UDim2.new(0, EDGE_SIZE, 1, 0))
+    local resizing = nil
 
+    UIS.InputChanged:Connect(function(input)
+        if input.UserInputType ~= Enum.UserInputType.MouseMovement then return end
+        if not resizing then return end
+
+        local delta = input.Position - resizing.startPos
+        local newSize = resizing.startSize
+        local newPos = resizing.startPosUDim
+
+        if resizing.edge == "Right" then
+            newSize = UDim2.new(0, math.max(400, resizing.startSize.X.Offset + delta.X), 0, resizing.startSize.Y.Offset)
+        elseif resizing.edge == "Left" then
+            newSize = UDim2.new(0, math.max(400, resizing.startSize.X.Offset - delta.X), 0, resizing.startSize.Y.Offset)
+            newPos = UDim2.new(
+                resizing.startPosUDim.X.Scale,
+                resizing.startPosUDim.X.Offset + delta.X,
+                resizing.startPosUDim.Y.Scale,
+                resizing.startPosUDim.Y.Offset
+            )
+        elseif resizing.edge == "Bottom" then
+            newSize = UDim2.new(0, resizing.startSize.X.Offset, 0, math.max(300, resizing.startSize.Y.Offset + delta.Y))
+        elseif resizing.edge == "Top" then
+            newSize = UDim2.new(0, resizing.startSize.X.Offset, 0, math.max(300, resizing.startSize.Y.Offset - delta.Y))
+            newPos = UDim2.new(
+                resizing.startPosUDim.X.Scale,
+                resizing.startPosUDim.X.Offset,
+                resizing.startPosUDim.Y.Scale,
+                resizing.startPosUDim.Y.Offset + delta.Y
+            )
+        end
+
+        Main.Size = newSize
+    end)
+
+    UIS.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            resizing = nil
+        end
+    end)
     -- Sidebar
     local Sidebar = Instance.new("Frame")
     Sidebar.Name = "Sidebar"
@@ -648,6 +690,8 @@ function Phat:CreateWindow(cfg)
                 tw(t._lbl, {TextColor3 = C.T3}, 0.12)
             end
             Page.Visible = true
+            Page.BackgroundTransparency = 1
+            tw(Page, {BackgroundTransparency = 0}, 0.2)
             lBar.Visible = true
             tw(TBtn, {BackgroundColor3 = C.ELEMH, BackgroundTransparency = 0}, 0.12)
             tw(tLbl, {TextColor3 = C.RED2}, 0.12)
@@ -782,7 +826,19 @@ function Phat:CreateWindow(cfg)
                     TextSize = 16,
                     Font = Enum.Font.GothamBold,
                 })
+                local busy = false
+                btn.MouseButton1Click:Connect(function()
+                    if busy then return end
+                    busy = true
 
+                    tw(btn, {BackgroundColor3 = C.DARKRED}, 0.05)
+                    task.delay(0.07, function()
+                        tw(btn, {BackgroundColor3 = C.ELEM}, 0.15)
+                        busy = false
+                    end)
+
+                    if bc.Callback then pcall(bc.Callback) end
+                end)
                 btn.MouseEnter:Connect(function()
                     tw(btn, {BackgroundColor3 = C.ELEMH}, 0.1)
                     tw(arr, {TextColor3 = C.RED2}, 0.1)
@@ -790,13 +846,6 @@ function Phat:CreateWindow(cfg)
                 btn.MouseLeave:Connect(function()
                     tw(btn, {BackgroundColor3 = C.ELEM}, 0.12)
                     tw(arr, {TextColor3 = C.T3}, 0.12)
-                end)
-                btn.MouseButton1Click:Connect(function()
-                    tw(btn, {BackgroundColor3 = C.DARKRED}, 0.05)
-                    task.delay(0.07, function()
-                        tw(btn, {BackgroundColor3 = C.ELEM}, 0.15)
-                    end)
-                    if bc.Callback then pcall(bc.Callback) end
                 end)
             end
 
@@ -1135,7 +1184,28 @@ function Phat:CreateWindow(cfg)
                     tw(panel, {Size = open and UDim2.new(1, 0, 0, pH) or UDim2.new(1, 0, 0, 0)}, 0.16, Enum.EasingStyle.Quart)
                     tw(dArr, {Rotation = open and 180 or 0}, 0.16)
                 end)
+                local connection
+                connection = UIS.InputBegan:Connect(function(i)
+                    if i.UserInputType == Enum.UserInputType.MouseButton1 then
+                        if open then
+                            local mousePos = i.Position
+                            local absPos = ddw.AbsolutePosition
+                            local absSize = ddw.AbsoluteSize
 
+                            local inside =
+                                mousePos.X >= absPos.X and
+                                mousePos.X <= absPos.X + absSize.X and
+                                mousePos.Y >= absPos.Y and
+                                mousePos.Y <= absPos.Y + absSize.Y
+
+                            if not inside then
+                                open = false
+                                tw(panel, {Size = UDim2.new(1, 0, 0, 0)}, 0.14)
+                                tw(dArr, {Rotation = 0}, 0.14)
+                            end
+                        end
+                    end
+                end)
                 return {
                     Get = function() return sel end,
                     Set = function(v)
@@ -1143,9 +1213,13 @@ function Phat:CreateWindow(cfg)
                         dLbl.Text = v
                         dLbl.TextColor3 = C.T1
                     end,
+                    Destroy = function()
+                        if connection then
+                            connection:Disconnect()
+                        end
+                    end
                 }
             end
-
             return Sec
         end
 
