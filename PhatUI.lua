@@ -1,51 +1,53 @@
 --[[
   ██████╗ ██╗  ██╗ █████╗ ████████╗    ██╗   ██╗██╗
-  Phat UI v6.0  ·  Red & Black
-  Fixes:
+  Phat UI v7.0  ·  Red & Black
+  Features:
     • Thông báo tự động ẩn sau countdown
     • Nút X không bị cắt
     • Kéo UI từ mọi cạnh/rìa
-    • Floating toggle button để bật/tắt UI
+    • Floating toggle button
+    • Multiple tab assignment support
 --]]
 
 local Phat = {}
 Phat.__index = Phat
 
 local TweenService = game:GetService("TweenService")
-local UIS          = game:GetService("UserInputService")
-local Players      = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
-local Player    = Players.LocalPlayer
+local Player = Players.LocalPlayer
 local PlayerGui = Player:WaitForChild("PlayerGui")
 
--- ─── Palette: Red & Black ─────────────────────
+-- Palette: Red & Black
 local C = {
-    WIN     = Color3.fromRGB(17,  17, 22),
-    TOP     = Color3.fromRGB(14,  14, 18),
-    SIDE    = Color3.fromRGB(12,  12, 16),
-    SEC     = Color3.fromRGB(22,  22, 28),
-    ELEM    = Color3.fromRGB(26,  26, 32),
-    ELEMH   = Color3.fromRGB(34,  22, 22),
+    WIN = Color3.fromRGB(17, 17, 22),
+    TOP = Color3.fromRGB(14, 14, 18),
+    SIDE = Color3.fromRGB(12, 12, 16),
+    SEC = Color3.fromRGB(22, 22, 28),
+    ELEM = Color3.fromRGB(26, 26, 32),
+    ELEMH = Color3.fromRGB(34, 22, 22),
 
-    RED     = Color3.fromRGB(204,  34,  34),
-    RED2    = Color3.fromRGB(255,  68,  68),
-    DARKRED = Color3.fromRGB(102,  10,  10),
+    RED = Color3.fromRGB(204, 34, 34),
+    RED2 = Color3.fromRGB(255, 68, 68),
+    DARKRED = Color3.fromRGB(102, 10, 10),
 
-    GREEN   = Color3.fromRGB( 34, 204, 100),
-    BLUE    = Color3.fromRGB( 51, 153, 255),
-    AMBER   = Color3.fromRGB(204, 136,   0),
+    GREEN = Color3.fromRGB(34, 204, 100),
+    BLUE = Color3.fromRGB(51, 153, 255),
+    AMBER = Color3.fromRGB(204, 136, 0),
 
     T1 = Color3.fromRGB(238, 238, 238),
     T2 = Color3.fromRGB(170, 155, 155),
-    T3 = Color3.fromRGB( 90,  70,  70),
+    T3 = Color3.fromRGB(90, 70, 70),
 
-    DIV  = Color3.fromRGB(30, 20, 20),
-    BOR  = Color3.fromRGB(42, 21, 21),
+    DIV = Color3.fromRGB(30, 20, 20),
+    BOR = Color3.fromRGB(42, 21, 21),
 }
 
--- ─── Helpers ──────────────────────────────────
+-- Helpers
 local function tw(o, p, t, s, d)
-    local ti = TweenInfo.new(t or .18, s or Enum.EasingStyle.Quart, d or Enum.EasingDirection.Out)
+    local ti = TweenInfo.new(t or 0.18, s or Enum.EasingStyle.Quart, d or Enum.EasingDirection.Out)
     local tween = TweenService:Create(o, ti, p)
     tween:Play()
     return tween
@@ -54,7 +56,6 @@ end
 local function corner(p, r)
     local c = Instance.new("UICorner", p)
     c.CornerRadius = UDim.new(0, r or 8)
-    return c
 end
 
 local function stroke(p, col, th)
@@ -66,11 +67,10 @@ end
 
 local function pad(p, t, r, b, l)
     local u = Instance.new("UIPadding", p)
-    u.PaddingTop    = UDim.new(0, t or 6)
-    u.PaddingRight  = UDim.new(0, r or 8)
+    u.PaddingTop = UDim.new(0, t or 6)
+    u.PaddingRight = UDim.new(0, r or 8)
     u.PaddingBottom = UDim.new(0, b or 6)
-    u.PaddingLeft   = UDim.new(0, l or 8)
-    return u
+    u.PaddingLeft = UDim.new(0, l or 8)
 end
 
 local function vlist(p, px)
@@ -89,151 +89,34 @@ local function mkLabel(parent, props)
     return l
 end
 
--- ─── Edge Drag System ─────────────────────────
-local function setupEdgeDrag(Main, Window)
-    local EDGE_SIZE = 12
-    local dragging = { active = false, edge = nil, startPos = nil, startMainPos = nil }
-    
-    local function createEdgeHitbox(position, size, edgeName)
-        local hitbox = Instance.new("Frame")
-        hitbox.Name = "Edge_" .. edgeName
-        hitbox.Size = size
-        hitbox.Position = position
-        hitbox.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-        hitbox.BackgroundTransparency = 1
-        hitbox.BorderSizePixel = 0
-        hitbox.ZIndex = 100
-        hitbox.Parent = Main
-        
-        hitbox.InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                dragging.active = true
-                dragging.edge = edgeName
-                dragging.startPos = input.Position
-                dragging.startMainPos = Main.Position
-            end
-        end)
-        
-        hitbox.InputEnded:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                dragging.active = false
-                dragging.edge = nil
-            end
-        end)
-        
-        return hitbox
-    end
-    
-    createEdgeHitbox(UDim2.new(0, 0, 0, 0),      UDim2.new(1, 0, 0, EDGE_SIZE), "top")
-    createEdgeHitbox(UDim2.new(0, 0, 1, -EDGE_SIZE), UDim2.new(1, 0, 0, EDGE_SIZE), "bottom")
-    createEdgeHitbox(UDim2.new(0, 0, 0, 0),      UDim2.new(0, EDGE_SIZE, 1, 0), "left")
-    createEdgeHitbox(UDim2.new(1, -EDGE_SIZE, 0, 0), UDim2.new(0, EDGE_SIZE, 1, 0), "right")
-    createEdgeHitbox(UDim2.new(0, 0, 0, 0),      UDim2.new(0, EDGE_SIZE, 0, EDGE_SIZE), "topleft")
-    createEdgeHitbox(UDim2.new(1, -EDGE_SIZE, 0, 0), UDim2.new(0, EDGE_SIZE, 0, EDGE_SIZE), "topright")
-    createEdgeHitbox(UDim2.new(0, 0, 1, -EDGE_SIZE), UDim2.new(0, EDGE_SIZE, 0, EDGE_SIZE), "bottomleft")
-    createEdgeHitbox(UDim2.new(1, -EDGE_SIZE, 1, -EDGE_SIZE), UDim2.new(0, EDGE_SIZE, 0, EDGE_SIZE), "bottomright")
-    
-    local function isResizingEdge(edge)
-        return edge and (edge:find("left") or edge:find("right"))
-    end
-    
-    UIS.InputChanged:Connect(function(input)
-        if dragging.active and dragging.edge then
-            if input.UserInputType == Enum.UserInputType.MouseMovement then
-                local delta = input.Position - dragging.startPos
-                local edge = dragging.edge
-                
-                if edge == "top" or edge == "bottom" or edge == "topleft" or edge == "topright" then
-                    Main.Position = UDim2.new(
-                        dragging.startMainPos.X.Scale,
-                        dragging.startMainPos.X.Offset + delta.X,
-                        dragging.startMainPos.Y.Scale,
-                        dragging.startMainPos.Y.Offset + delta.Y
-                    )
-                else
-                    Main.Position = UDim2.new(
-                        dragging.startMainPos.X.Scale,
-                        dragging.startMainPos.X.Offset + delta.X,
-                        dragging.startMainPos.Y.Scale,
-                        dragging.startMainPos.Y.Offset + delta.Y
-                    )
-                end
-                
-                if isResizingEdge(edge) then
-                    local newWidth = Window._originalSize.X.Offset - delta.X
-                    newWidth = math.max(400, math.min(newWidth, 1200))
-                    Window._originalSize = UDim2.new(0, newWidth, 0, Window._originalSize.Y)
-                    Main.Size = Window._originalSize
-                end
-            end
-        end
-    end)
-    
-    UIS.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging.active = false
-            dragging.edge = nil
-        end
-    end)
-end
-
--- ─── TopBar Drag ──────────────────────────────
-local function attachTopBarDrag(Main)
-    local drag = { active = false, startPos = nil, startMainPos = nil }
-    
-    local TopBar = Main:FindFirstChild("TopBar")
-    if not TopBar then return end
-    
-    TopBar.InputBegan:Connect(function(i)
-        if i.UserInputType == Enum.UserInputType.MouseButton1 then
-            drag.active = true
-            drag.startPos = i.Position
-            drag.startMainPos = Main.Position
-        end
-    end)
-    
-    TopBar.InputEnded:Connect(function(i)
-        if i.UserInputType == Enum.UserInputType.MouseButton1 then
-            drag.active = false
-        end
-    end)
-    
-    UIS.InputChanged:Connect(function(i)
-        if drag.active and i.UserInputType == Enum.UserInputType.MouseMovement then
-            local delta = i.Position - drag.startPos
-            Main.Position = UDim2.new(
-                drag.startMainPos.X.Scale,
-                drag.startMainPos.X.Offset + delta.X,
-                drag.startMainPos.Y.Scale,
-                drag.startMainPos.Y.Offset + delta.Y
-            )
-        end
-    end)
-end
-
--- ─── Notification System ──────────────────────
-local _nh = nil
+-- Notification System
+local NotificationHolder = nil
 
 local function notify(title, msg, ntype, duration)
-    if not _nh then return end
     duration = math.max(1, duration or 4)
     
+    if not NotificationHolder then
+        warn("[PhatUI] NotificationHolder not initialized")
+        return
+    end
+
     local accent = ({
-        info    = C.BLUE,
+        info = C.BLUE,
         success = C.GREEN,
-        error   = C.RED,
-        warn    = C.AMBER,
+        error = C.RED,
+        warn = C.AMBER,
     })[ntype or "info"] or C.RED
-    
+
     local card = Instance.new("Frame")
     card.Name = "Notification"
-    card.Size = UDim2.new(1, 0, 0, 70)
+    card.Size = UDim2.new(1, -4, 0, 68)
     card.BackgroundColor3 = C.WIN
+    card.BackgroundTransparency = 0
     card.BorderSizePixel = 0
     corner(card, 10)
     stroke(card, accent, 1)
-    card.Parent = _nh
-    
+    card.Parent = NotificationHolder
+
     local strip = Instance.new("Frame")
     strip.Size = UDim2.new(0, 4, 1, -16)
     strip.Position = UDim2.new(0, 0, 0, 8)
@@ -241,46 +124,46 @@ local function notify(title, msg, ntype, duration)
     strip.BorderSizePixel = 0
     corner(strip, 3)
     strip.Parent = card
-    
+
     local badge = Instance.new("TextLabel")
-    badge.Size = UDim2.fromOffset(60, 16)
+    badge.Size = UDim2.fromOffset(55, 15)
     badge.Position = UDim2.new(0, 12, 0, 8)
     badge.BackgroundColor3 = accent
     badge.BackgroundTransparency = 0.7
     badge.Text = string.upper(ntype or "INFO")
     badge.TextColor3 = accent
-    badge.TextSize = 10
+    badge.TextSize = 9
     badge.Font = Enum.Font.GothamBold
     badge.TextXAlignment = Enum.TextXAlignment.Center
     badge.BorderSizePixel = 0
     corner(badge, 4)
     badge.Parent = card
-    
+
     local countdownLbl = Instance.new("TextLabel")
-    countdownLbl.Size = UDim2.fromOffset(30, 16)
-    countdownLbl.Position = UDim2.new(1, -36, 0, 8)
+    countdownLbl.Size = UDim2.fromOffset(28, 15)
+    countdownLbl.Position = UDim2.new(1, -34, 0, 8)
     countdownLbl.BackgroundTransparency = 1
     countdownLbl.Text = tostring(duration) .. "s"
     countdownLbl.TextColor3 = C.T3
-    countdownLbl.TextSize = 10
+    countdownLbl.TextSize = 9
     countdownLbl.Font = Enum.Font.GothamBold
     countdownLbl.TextXAlignment = Enum.TextXAlignment.Right
     countdownLbl.Parent = card
-    
+
     local titleLbl = Instance.new("TextLabel")
-    titleLbl.Size = UDim2.new(1, -20, 0, 18)
+    titleLbl.Size = UDim2.new(1, -24, 0, 18)
     titleLbl.Position = UDim2.new(0, 16, 0, 26)
     titleLbl.BackgroundTransparency = 1
     titleLbl.Text = title or ""
     titleLbl.TextColor3 = C.T1
-    titleLbl.TextSize = 13
+    titleLbl.TextSize = 12
     titleLbl.Font = Enum.Font.GothamBold
     titleLbl.TextXAlignment = Enum.TextXAlignment.Left
     titleLbl.TextTruncate = Enum.TextTruncate.AtEnd
     titleLbl.Parent = card
-    
+
     local msgLbl = Instance.new("TextLabel")
-    msgLbl.Size = UDim2.new(1, -20, 0, 16)
+    msgLbl.Size = UDim2.new(1, -24, 0, 16)
     msgLbl.Position = UDim2.new(0, 16, 0, 46)
     msgLbl.BackgroundTransparency = 1
     msgLbl.Text = msg or ""
@@ -290,90 +173,83 @@ local function notify(title, msg, ntype, duration)
     msgLbl.TextXAlignment = Enum.TextXAlignment.Left
     msgLbl.TextTruncate = Enum.TextTruncate.AtEnd
     msgLbl.Parent = card
-    
+
     local progressTrack = Instance.new("Frame")
     progressTrack.Size = UDim2.new(1, 0, 0, 3)
     progressTrack.Position = UDim2.new(0, 0, 1, -3)
     progressTrack.BackgroundColor3 = C.DIV
     progressTrack.BorderSizePixel = 0
     progressTrack.Parent = card
-    
+
     local progressFill = Instance.new("Frame")
     progressFill.Size = UDim2.new(1, 0, 1, 0)
     progressFill.BackgroundColor3 = accent
     progressFill.BorderSizePixel = 0
     corner(progressFill, 1)
     progressFill.Parent = progressTrack
-    
+
     card.Position = UDim2.new(1.1, 0, 0, 0)
-    tw(card, {Position = UDim2.new(0, 0, 0, 0)}, .25, Enum.EasingStyle.Quint)
-    
+    tw(card, {Position = UDim2.new(0, 0, 0, 0)}, 0.25, Enum.EasingStyle.Quint)
+
     tw(progressFill, {Size = UDim2.new(0, 0, 1, 0)}, duration, Enum.EasingStyle.Linear)
-    
-    local remaining = duration
+
     task.spawn(function()
-        while remaining > 0 and card.Parent do
+        for i = duration - 1, 0, -1 do
             task.wait(1)
-            remaining = remaining - 1
             if countdownLbl and countdownLbl.Parent then
-                countdownLbl.Text = tostring(math.max(0, remaining)) .. "s"
+                countdownLbl.Text = tostring(i) .. "s"
             end
         end
     end)
-    
-    task.delay(duration + 0.1, function()
+
+    task.delay(duration + 0.05, function()
         if card and card.Parent then
-            tw(card, {Position = UDim2.new(1.1, 0, 0, 0)}, .2, Enum.EasingStyle.Quint)
-            task.delay(.22, function()
-                if card and card.Parent then
-                    card:Destroy()
-                end
-            end)
+            tw(card, {Position = UDim2.new(1.1, 0, 0, 0)}, 0.2, Enum.EasingStyle.Quint)
+            task.wait(0.22)
+            if card and card.Parent then
+                card:Destroy()
+            end
         end
     end)
-    
+
     return card
 end
 
--- ═════════════════════════════════════════════
---  CreateWindow
--- ═════════════════════════════════════════════
+-- CreateWindow
 function Phat:CreateWindow(cfg)
     cfg = cfg or {}
-    local W  = cfg.Width  or 640
-    local H  = cfg.Height or 480
+    local W = cfg.Width or 640
+    local H = cfg.Height or 500
     local SW = cfg.SidebarWidth or 150
 
     local Window = {
         _tabs = {},
         Notify = notify,
         _visible = true,
-        _originalSize = UDim2.fromOffset(W, H),
+        _width = W,
+        _height = H,
     }
 
-    -- Main ScreenGui
     local sg = Instance.new("ScreenGui")
-    sg.Name = "PhatUI_v6"
+    sg.Name = "PhatUI_v7"
     sg.Parent = PlayerGui
     sg.ResetOnSpawn = false
     sg.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-    -- Notification holder
-    _nh = Instance.new("Frame")
-    _nh.Name = "NotificationHolder"
-    _nh.Size = UDim2.fromOffset(300, 400)
-    _nh.Position = UDim2.new(1, -320, 1, -420)
-    _nh.BackgroundTransparency = 1
-    _nh.ClipsDescendants = true
-    _nh.Parent = sg
-    local nl = vlist(_nh, 8)
+    NotificationHolder = Instance.new("Frame")
+    NotificationHolder.Name = "NotificationHolder"
+    NotificationHolder.Size = UDim2.new(0, 300, 0, 400)
+    NotificationHolder.Position = UDim2.new(1, -320, 1, -420)
+    NotificationHolder.BackgroundTransparency = 1
+    NotificationHolder.ClipsDescendants = true
+    NotificationHolder.Parent = sg
+    local nl = vlist(NotificationHolder, 8)
     nl.VerticalAlignment = Enum.VerticalAlignment.Bottom
 
-    -- Main Frame
     local Main = Instance.new("Frame")
     Main.Name = "Main"
     Main.Size = UDim2.new(0, W, 0, H)
-    Main.Position = UDim2.new(0.5, -W/2, 0.5, -H/2)
+    Main.Position = UDim2.new(0.5, 0, 0.5, 0)
     Main.AnchorPoint = Vector2.new(0.5, 0.5)
     Main.BackgroundColor3 = C.WIN
     Main.BorderSizePixel = 0
@@ -382,9 +258,7 @@ function Phat:CreateWindow(cfg)
     corner(Main, 14)
     stroke(Main, C.BOR, 1.5)
 
-    Window._originalSize = Main.Size
-
-    -- ── TopBar ─────────────────────────────────
+    -- TopBar
     local TopBar = Instance.new("Frame")
     TopBar.Name = "TopBar"
     TopBar.Size = UDim2.new(1, 0, 0, 44)
@@ -419,7 +293,7 @@ function Phat:CreateWindow(cfg)
         TextXAlignment = Enum.TextXAlignment.Left,
     })
 
-    -- Window Control Buttons
+    -- Window Buttons
     local function makeBtn(xOff, txt, nc, hc, tc)
         local btn = Instance.new("TextButton")
         btn.Size = UDim2.fromOffset(26, 26)
@@ -433,25 +307,88 @@ function Phat:CreateWindow(cfg)
         btn.AutoButtonColor = false
         corner(btn, 6)
         btn.Parent = TopBar
-        
+
         btn.MouseEnter:Connect(function()
-            tw(btn, {BackgroundColor3 = hc}, .1)
+            tw(btn, {BackgroundColor3 = hc}, 0.1)
         end)
         btn.MouseLeave:Connect(function()
-            tw(btn, {BackgroundColor3 = nc}, .1)
+            tw(btn, {BackgroundColor3 = nc}, 0.1)
         end)
-        
+
         return btn
     end
 
-    local BtnMin   = makeBtn(-72, "─", C.ELEM, C.ELEMH, C.T3)
-    local BtnMax   = makeBtn(-42, "□", C.ELEM, C.ELEMH, C.T3)
+    local BtnMin = makeBtn(-72, "─", C.ELEM, C.ELEMH, C.T3)
+    local BtnMax = makeBtn(-42, "□", C.ELEM, C.ELEMH, C.T3)
     local BtnClose = makeBtn(-12, "✕", Color3.fromRGB(45, 12, 12), C.RED, C.RED)
 
-    attachTopBarDrag(Main)
-    setupEdgeDrag(Main, Window)
+    -- TopBar Drag
+    local drag = {active = false, startPos = nil, startMainPos = nil}
+    TopBar.InputBegan:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 then
+            drag.active = true
+            drag.startPos = i.Position
+            drag.startMainPos = Main.Position
+        end
+    end)
+    TopBar.InputEnded:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 then
+            drag.active = false
+        end
+    end)
+    UIS.InputChanged:Connect(function(i)
+        if drag.active and i.UserInputType == Enum.UserInputType.MouseMovement then
+            local delta = i.Position - drag.startPos
+            Main.Position = UDim2.new(
+                drag.startMainPos.X.Scale,
+                drag.startMainPos.X.Offset + delta.X,
+                drag.startMainPos.Y.Scale,
+                drag.startMainPos.Y.Offset + delta.Y
+            )
+        end
+    end)
 
-    -- ── Sidebar ────────────────────────────────
+    -- Edge Drag
+    local EDGE_SIZE = 10
+    local function createEdgeHitbox(name, pos, size)
+        local hitbox = Instance.new("Frame")
+        hitbox.Name = "Edge_" .. name
+        hitbox.Size = size
+        hitbox.Position = pos
+        hitbox.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        hitbox.BackgroundTransparency = 1
+        hitbox.BorderSizePixel = 0
+        hitbox.ZIndex = 100
+        hitbox.Parent = Main
+
+        local dragging = false
+        local startPos, startMainPos
+
+        hitbox.InputBegan:Connect(function(i)
+            if i.UserInputType == Enum.UserInputType.MouseButton1 then
+                dragging = true
+                startPos = i.Position
+                startMainPos = Main.Position
+            end
+        end)
+        hitbox.InputEnded:Connect(function(i)
+            if i.UserInputType == Enum.UserInputType.MouseButton1 then
+                dragging = false
+            end
+        end)
+
+        return {hitbox = hitbox, dragging = function() return dragging end, 
+                setDragging = function(v) dragging = v end,
+                getStart = function() return startPos, startMainPos end,
+                setStart = function(s, m) startPos = s; startMainPos = m end}
+    end
+
+    createEdgeHitbox("Top", UDim2.new(0, 0, 0, 0), UDim2.new(1, 0, 0, EDGE_SIZE))
+    createEdgeHitbox("Bottom", UDim2.new(0, 0, 1, -EDGE_SIZE), UDim2.new(1, 0, 0, EDGE_SIZE))
+    createEdgeHitbox("Left", UDim2.new(0, 0, 0, 0), UDim2.new(0, EDGE_SIZE, 1, 0))
+    createEdgeHitbox("Right", UDim2.new(1, -EDGE_SIZE, 0, 0), UDim2.new(0, EDGE_SIZE, 1, 0))
+
+    -- Sidebar
     local Sidebar = Instance.new("Frame")
     Sidebar.Name = "Sidebar"
     Sidebar.Size = UDim2.new(0, SW, 1, -44)
@@ -485,7 +422,7 @@ function Phat:CreateWindow(cfg)
     vlist(tabContainer, 4)
     pad(tabContainer, 2, 6, 6, 6)
 
-    -- ── Content ────────────────────────────────
+    -- Content
     local Content = Instance.new("ScrollingFrame")
     Content.Name = "Content"
     Content.Size = UDim2.new(1, -SW, 1, -44)
@@ -500,12 +437,10 @@ function Phat:CreateWindow(cfg)
     vlist(Content, 10)
     pad(Content, 12, 12, 12, 12)
 
-    -- ══════════════════════════════════════════
-    --  FLOATING TOGGLE BUTTON
-    -- ══════════════════════════════════════════
+    -- Floating Toggle Button
     local CoreGui = game:GetService("CoreGui")
     local ToggleGui = Instance.new("ScreenGui")
-    ToggleGui.Name = "PhatToggle_v6"
+    ToggleGui.Name = "PhatToggle_v7"
     ToggleGui.Parent = CoreGui
     ToggleGui.ResetOnSpawn = false
     ToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
@@ -535,8 +470,8 @@ function Phat:CreateWindow(cfg)
     BtnStroke.Color = Color3.fromRGB(130, 130, 130)
     BtnStroke.Parent = ToggleBtn
 
-    local btnDrag = { active = false, start = nil, orig = nil }
-    
+    local btnDrag = {active = false, start = nil, orig = nil}
+
     ToggleBtn.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             btnDrag.active = true
@@ -544,13 +479,13 @@ function Phat:CreateWindow(cfg)
             btnDrag.orig = ToggleBtn.Position
         end
     end)
-    
+
     ToggleBtn.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             btnDrag.active = false
         end
     end)
-    
+
     UIS.InputChanged:Connect(function(input)
         if btnDrag.active and input.UserInputType == Enum.UserInputType.MouseMovement then
             local delta = input.Position - btnDrag.start
@@ -566,7 +501,7 @@ function Phat:CreateWindow(cfg)
     ToggleBtn.MouseButton1Click:Connect(function()
         Window._visible = not Window._visible
         Main.Visible = Window._visible
-        
+
         if Window._visible then
             BtnGrad.Color = ColorSequence.new({
                 ColorSequenceKeypoint.new(0, Color3.fromRGB(90, 90, 90)),
@@ -583,7 +518,7 @@ function Phat:CreateWindow(cfg)
     end)
 
     ToggleBtn.MouseEnter:Connect(function()
-        tw(ToggleBtn, {Size = UDim2.new(0, 60, 0, 60)}, .12, Enum.EasingStyle.Quad)
+        tw(ToggleBtn, {Size = UDim2.new(0, 60, 0, 60)}, 0.12, Enum.EasingStyle.Quad)
         BtnGrad.Color = ColorSequence.new({
             ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 85, 0)),
             ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 20, 0))
@@ -593,14 +528,14 @@ function Phat:CreateWindow(cfg)
 
     ToggleBtn.MouseLeave:Connect(function()
         if Window._visible then
-            tw(ToggleBtn, {Size = UDim2.new(0, 52, 0, 52)}, .12, Enum.EasingStyle.Quad)
+            tw(ToggleBtn, {Size = UDim2.new(0, 52, 0, 52)}, 0.12, Enum.EasingStyle.Quad)
             BtnGrad.Color = ColorSequence.new({
                 ColorSequenceKeypoint.new(0, Color3.fromRGB(90, 90, 90)),
                 ColorSequenceKeypoint.new(1, Color3.fromRGB(35, 35, 35))
             })
             BtnStroke.Color = Color3.fromRGB(130, 130, 130)
         else
-            tw(ToggleBtn, {Size = UDim2.new(0, 52, 0, 52)}, .12, Enum.EasingStyle.Quad)
+            tw(ToggleBtn, {Size = UDim2.new(0, 52, 0, 52)}, 0.12, Enum.EasingStyle.Quad)
         end
     end)
 
@@ -638,7 +573,7 @@ function Phat:CreateWindow(cfg)
         return self._visible
     end
 
-    -- ── AddTab ─────────────────────────────────
+    -- AddTab
     local tabIdx = 0
 
     function Window:AddTab(cfg)
@@ -709,13 +644,13 @@ function Phat:CreateWindow(cfg)
             for _, t in ipairs(Window._tabs) do
                 t._page.Visible = false
                 t._lbar.Visible = false
-                tw(t._btn, {BackgroundTransparency = 1}, .12)
-                tw(t._lbl, {TextColor3 = C.T3}, .12)
+                tw(t._btn, {BackgroundTransparency = 1}, 0.12)
+                tw(t._lbl, {TextColor3 = C.T3}, 0.12)
             end
             Page.Visible = true
             lBar.Visible = true
-            tw(TBtn, {BackgroundColor3 = C.ELEMH, BackgroundTransparency = 0}, .12)
-            tw(tLbl, {TextColor3 = C.RED2}, .12)
+            tw(TBtn, {BackgroundColor3 = C.ELEMH, BackgroundTransparency = 0}, 0.12)
+            tw(tLbl, {TextColor3 = C.RED2}, 0.12)
         end
 
         Tab._page = Page
@@ -726,12 +661,12 @@ function Phat:CreateWindow(cfg)
         TBtn.MouseButton1Click:Connect(activate)
         TBtn.MouseEnter:Connect(function()
             if not Page.Visible then
-                tw(TBtn, {BackgroundColor3 = Color3.fromRGB(30, 15, 15), BackgroundTransparency = 0}, .08)
+                tw(TBtn, {BackgroundColor3 = Color3.fromRGB(30, 15, 15), BackgroundTransparency = 0}, 0.08)
             end
         end)
         TBtn.MouseLeave:Connect(function()
             if not Page.Visible then
-                tw(TBtn, {BackgroundTransparency = 1}, .1)
+                tw(TBtn, {BackgroundTransparency = 1}, 0.1)
             end
         end)
 
@@ -849,17 +784,17 @@ function Phat:CreateWindow(cfg)
                 })
 
                 btn.MouseEnter:Connect(function()
-                    tw(btn, {BackgroundColor3 = C.ELEMH}, .1)
-                    tw(arr, {TextColor3 = C.RED2}, .1)
+                    tw(btn, {BackgroundColor3 = C.ELEMH}, 0.1)
+                    tw(arr, {TextColor3 = C.RED2}, 0.1)
                 end)
                 btn.MouseLeave:Connect(function()
-                    tw(btn, {BackgroundColor3 = C.ELEM}, .12)
-                    tw(arr, {TextColor3 = C.T3}, .12)
+                    tw(btn, {BackgroundColor3 = C.ELEM}, 0.12)
+                    tw(arr, {TextColor3 = C.T3}, 0.12)
                 end)
                 btn.MouseButton1Click:Connect(function()
-                    tw(btn, {BackgroundColor3 = C.DARKRED}, .05)
-                    task.delay(.07, function()
-                        tw(btn, {BackgroundColor3 = C.ELEM}, .15)
+                    tw(btn, {BackgroundColor3 = C.DARKRED}, 0.05)
+                    task.delay(0.07, function()
+                        tw(btn, {BackgroundColor3 = C.ELEM}, 0.15)
                     end)
                     if bc.Callback then pcall(bc.Callback) end
                 end)
@@ -920,15 +855,15 @@ function Phat:CreateWindow(cfg)
                 local function set(v)
                     state = v
                     if v then
-                        tw(track, {BackgroundColor3 = C.DARKRED}, .16)
-                        tw(knob, {Position = UDim2.new(1, -15, 0.5, -6), BackgroundColor3 = C.RED2}, .18)
+                        tw(track, {BackgroundColor3 = C.DARKRED}, 0.16)
+                        tw(knob, {Position = UDim2.new(1, -15, 0.5, -6), BackgroundColor3 = C.RED2}, 0.18)
                         tStr.Color = C.RED
-                        tw(sLbl, {Text = "ON", TextColor3 = C.RED2}, .1)
+                        tw(sLbl, {Text = "ON", TextColor3 = C.RED2}, 0.1)
                     else
-                        tw(track, {BackgroundColor3 = C.DIV}, .16)
-                        tw(knob, {Position = UDim2.new(0, 3, 0.5, -6), BackgroundColor3 = C.T3}, .18)
+                        tw(track, {BackgroundColor3 = C.DIV}, 0.16)
+                        tw(knob, {Position = UDim2.new(0, 3, 0.5, -6), BackgroundColor3 = C.T3}, 0.18)
                         tStr.Color = C.BOR
-                        tw(sLbl, {Text = "OFF", TextColor3 = C.T3}, .1)
+                        tw(sLbl, {Text = "OFF", TextColor3 = C.T3}, 0.1)
                     end
                     if tc.Callback then pcall(tc.Callback, state) end
                 end
@@ -937,10 +872,10 @@ function Phat:CreateWindow(cfg)
                     if i.UserInputType == Enum.UserInputType.MouseButton1 then set(not state) end
                 end)
                 row.MouseEnter:Connect(function()
-                    tw(row, {BackgroundColor3 = C.ELEMH}, .08)
+                    tw(row, {BackgroundColor3 = C.ELEMH}, 0.08)
                 end)
                 row.MouseLeave:Connect(function()
-                    tw(row, {BackgroundColor3 = C.ELEM}, .1)
+                    tw(row, {BackgroundColor3 = C.ELEM}, 0.1)
                 end)
 
                 return {
@@ -1044,8 +979,8 @@ function Phat:CreateWindow(cfg)
                         v = math.clamp(v, mn, mx)
                         val = v
                         local p = (v - mn) / (mx - mn)
-                        tw(fill, {Size = UDim2.new(p, 0, 1, 0)}, .1)
-                        tw(handle, {Position = UDim2.new(p, -7, 0.5, -7)}, .1)
+                        tw(fill, {Size = UDim2.new(p, 0, 1, 0)}, 0.1)
+                        tw(handle, {Position = UDim2.new(p, -7, 0.5, -7)}, 0.1)
                         vLbl.Text = tostring(math.round(v))
                     end,
                 }
@@ -1102,7 +1037,7 @@ function Phat:CreateWindow(cfg)
                     if ic.Callback then pcall(ic.Callback, tb.Text, enter) end
                 end)
 
-                return { Get = function() return tb.Text end }
+                return {Get = function() return tb.Text end}
             end
 
             -- AddDropdown
@@ -1178,18 +1113,18 @@ function Phat:CreateWindow(cfg)
                     opt.Parent = panel
 
                     opt.MouseEnter:Connect(function()
-                        tw(opt, {BackgroundColor3 = C.ELEMH}, .08)
+                        tw(opt, {BackgroundColor3 = C.ELEMH}, 0.08)
                     end)
                     opt.MouseLeave:Connect(function()
-                        tw(opt, {BackgroundColor3 = C.ELEM}, .1)
+                        tw(opt, {BackgroundColor3 = C.ELEM}, 0.1)
                     end)
                     opt.MouseButton1Click:Connect(function()
                         sel = item
                         dLbl.Text = item
                         dLbl.TextColor3 = C.T1
                         open = false
-                        tw(panel, {Size = UDim2.new(1, 0, 0, 0)}, .14)
-                        tw(dArr, {Rotation = 0}, .14)
+                        tw(panel, {Size = UDim2.new(1, 0, 0, 0)}, 0.14)
+                        tw(dArr, {Rotation = 0}, 0.14)
                         if dc.Callback then pcall(dc.Callback, sel) end
                     end)
                 end
@@ -1197,8 +1132,8 @@ function Phat:CreateWindow(cfg)
                 local pH = #items * 30 + 8
                 dBtn.MouseButton1Click:Connect(function()
                     open = not open
-                    tw(panel, {Size = open and UDim2.new(1, 0, 0, pH) or UDim2.new(1, 0, 0, 0)}, .16, Enum.EasingStyle.Quart)
-                    tw(dArr, {Rotation = open and 180 or 0}, .16)
+                    tw(panel, {Size = open and UDim2.new(1, 0, 0, pH) or UDim2.new(1, 0, 0, 0)}, 0.16, Enum.EasingStyle.Quart)
+                    tw(dArr, {Rotation = open and 180 or 0}, 0.16)
                 end)
 
                 return {
@@ -1217,7 +1152,7 @@ function Phat:CreateWindow(cfg)
         return Tab
     end
 
-    -- ── Window Controls ────────────────────────
+    -- Window Controls
     local minimized = false
     local maximized = false
     local origSize = Main.Size
@@ -1228,11 +1163,11 @@ function Phat:CreateWindow(cfg)
         if minimized then
             Content.Visible = false
             Sidebar.Visible = false
-            tw(Main, {Size = UDim2.new(0, W, 0, 44)}, .2, Enum.EasingStyle.Quart)
+            tw(Main, {Size = UDim2.new(0, W, 0, 44)}, 0.2, Enum.EasingStyle.Quart)
         else
-            local newSize = maximized and UDim2.new(1, 0, 1, 0) or origSize
-            tw(Main, {Size = newSize}, .2, Enum.EasingStyle.Quart)
-            task.delay(.1, function()
+            local newSize = maximized and UDim2.new(1, -20, 1, -20) or origSize
+            tw(Main, {Size = newSize}, 0.2, Enum.EasingStyle.Quart)
+            task.delay(0.1, function()
                 Content.Visible = true
                 Sidebar.Visible = true
             end)
@@ -1245,17 +1180,17 @@ function Phat:CreateWindow(cfg)
         if maximized then
             origSize = Main.Size
             origPos = Main.Position
-            tw(Main, {Size = UDim2.new(1, -20, 1, -20), Position = UDim2.new(0.5, 0, 0.5, 0)}, .2, Enum.EasingStyle.Quart)
+            tw(Main, {Size = UDim2.new(1, -20, 1, -20), Position = UDim2.new(0.5, 0, 0.5, 0)}, 0.2, Enum.EasingStyle.Quart)
             BtnMax.Text = "❐"
         else
-            tw(Main, {Size = origSize, Position = origPos}, .2, Enum.EasingStyle.Quart)
+            tw(Main, {Size = origSize, Position = origPos}, 0.2, Enum.EasingStyle.Quart)
             BtnMax.Text = "□"
         end
     end)
 
     BtnClose.MouseButton1Click:Connect(function()
-        tw(Main, {Size = UDim2.new(0, W, 0, 0), BackgroundTransparency = 1}, .18, Enum.EasingStyle.Quart)
-        task.delay(.2, function()
+        tw(Main, {Size = UDim2.new(0, W, 0, 0), BackgroundTransparency = 1}, 0.18, Enum.EasingStyle.Quart)
+        task.delay(0.2, function()
             sg:Destroy()
             ToggleGui:Destroy()
         end)
@@ -1264,7 +1199,7 @@ function Phat:CreateWindow(cfg)
     -- Entry animation
     Main.BackgroundTransparency = 1
     Main.Size = UDim2.new(0, W * 0.85, 0, H * 0.85)
-    tw(Main, {Size = UDim2.new(0, W, 0, H), BackgroundTransparency = 0}, .28, Enum.EasingStyle.Quint)
+    tw(Main, {Size = UDim2.new(0, W, 0, H), BackgroundTransparency = 0}, 0.28, Enum.EasingStyle.Quint)
 
     return Window
 end
