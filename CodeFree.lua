@@ -30,7 +30,7 @@ local LucideIcons = {
     camera = "📷", mic = "🎤", volume = "🔊", ["volume-off"] = "🔇",
     wifi = "📶", bluetooth = "📡", battery = "🔋", cpu = "▣",
     harddrive = "💾", cloud = "☁", download = "⬇", upload = "⬆",
-    refresh = "↻", maximize = "□", minimize = "−", close = "✕",
+    refresh = "↻", maximize = "□", minimize = "−", close = "X",
     bug = "🐛", gift = "🎁", crown = "👑", gem = "💎", coin = "🪙",
     key = "🔑", compass = "🧭", clock = "⏰", calendar = "📅",
     alert = "⚠", info = "ℹ", help = "?", rocket = "🚀",
@@ -165,7 +165,7 @@ local function notify(title, msg, ntype, duration)
     iconBg.Parent = card
 
     local icon = mkLabel(iconBg, {
-        Text = ({info = "ℹ", success = "✓", error = "✕", warn = "⚠"})[ntype] or "ℹ",
+        Text = ({info = "i", success = "✓", error = "✕", warn = "⚠"})[ntype] or "i",
         Size = UDim2.new(1, 0, 1, 0),
         TextColor3 = accent,
         TextSize = 16,
@@ -360,7 +360,7 @@ function Phat:CreateWindow(cfg)
 
     local BtnMin = makeCtrlBtn("−", C.ELEM, C.ELEMH, C.T2)
     local BtnMax = makeCtrlBtn("□", C.ELEM, C.ELEMH, C.T2)
-    local BtnClose = makeCtrlBtn("✕", Color3.fromRGB(50, 20, 20), C.RED, C.RED2)
+    local BtnClose = makeCtrlBtn("X", Color3.fromRGB(50, 20, 20), C.RED, C.RED2)
 
     -- Drag TopBar
     local drag = {active = false, startPos = nil, startMainPos = nil}
@@ -470,7 +470,7 @@ function Phat:CreateWindow(cfg)
     local ToggleBtn = Instance.new("TextButton")
     ToggleBtn.Size = UDim2.new(0, 48, 0, 48)
     ToggleBtn.Position = UDim2.new(0, 16, 0.5, -24)
-    ToggleBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 32)
+    ToggleBtn.BackgroundColor3 = Color3.fromrgb(25, 25, 32)
     ToggleBtn.Text = "P"
     ToggleBtn.TextScaled = true
     ToggleBtn.Font = Enum.Font.GothamBlack
@@ -551,7 +551,7 @@ function Phat:CreateWindow(cfg)
         TBtn.Name = "Tab" .. mi
         TBtn.Size = UDim2.new(1, -8, 0, 46)
         TBtn.Position = UDim2.new(0, 4, 0, 0)
-        TBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        -- TBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
         TBtn.BackgroundTransparency = 1
         TBtn.Text = ""
         TBtn.BorderSizePixel = 0
