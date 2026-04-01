@@ -65,7 +65,7 @@ local C = {
     AMBER = Color3.fromRGB(200, 140, 20),
 
     T1 = Color3.fromRGB(245, 245, 245),
-    T2 = Color3.fromRGB(100, 15, 15),
+    T2 = Color3.fromRGB(180, 170, 170),
     T3 = Color3.fromRGB(100, 15, 15),
 
     DIV = Color3.fromRGB(35, 25, 25),
