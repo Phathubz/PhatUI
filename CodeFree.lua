@@ -30,7 +30,7 @@ local LucideIcons = {
     camera = "📷", mic = "🎤", volume = "🔊", ["volume-off"] = "🔇",
     wifi = "📶", bluetooth = "📡", battery = "🔋", cpu = "▣",
     harddrive = "💾", cloud = "☁", download = "⬇", upload = "⬆",
-    refresh = "↻", maximize = "□", minimize = "−", close = "X",
+    refresh = "↻", maximize = "□", minimize = "−", close = "✕",
     bug = "🐛", gift = "🎁", crown = "👑", gem = "💎", coin = "🪙",
     key = "🔑", compass = "🧭", clock = "⏰", calendar = "📅",
     alert = "⚠", info = "ℹ", help = "?", rocket = "🚀",
@@ -66,7 +66,7 @@ local C = {
 
     T1 = Color3.fromRGB(245, 245, 245),
     T2 = Color3.fromRGB(180, 170, 170),
-    T3 = Color3.fromRGB(100, 15, 15),
+    T3 = Color3.fromRGB(110, 95, 95),
 
     DIV = Color3.fromRGB(35, 25, 25),
     BOR = Color3.fromRGB(50, 30, 30),
@@ -165,7 +165,7 @@ local function notify(title, msg, ntype, duration)
     iconBg.Parent = card
 
     local icon = mkLabel(iconBg, {
-        Text = ({info = "i", success = "✓", error = "✕", warn = "⚠"})[ntype] or "i",
+        Text = ({info = "ℹ", success = "✓", error = "✕", warn = "⚠"})[ntype] or "ℹ",
         Size = UDim2.new(1, 0, 1, 0),
         TextColor3 = accent,
         TextSize = 16,
@@ -360,7 +360,7 @@ function Phat:CreateWindow(cfg)
 
     local BtnMin = makeCtrlBtn("−", C.ELEM, C.ELEMH, C.T2)
     local BtnMax = makeCtrlBtn("□", C.ELEM, C.ELEMH, C.T2)
-    local BtnClose = makeCtrlBtn("X", Color3.fromRGB(50, 20, 20), C.RED, C.RED2)
+    local BtnClose = makeCtrlBtn("✕", Color3.fromRGB(50, 20, 20), C.RED, C.RED2)
 
     -- Drag TopBar
     local drag = {active = false, startPos = nil, startMainPos = nil}
@@ -470,7 +470,7 @@ function Phat:CreateWindow(cfg)
     local ToggleBtn = Instance.new("TextButton")
     ToggleBtn.Size = UDim2.new(0, 48, 0, 48)
     ToggleBtn.Position = UDim2.new(0, 16, 0.5, -24)
-    ToggleBtn.BackgroundColor3 = Color3.fromrgb(25, 25, 32)
+    ToggleBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 32)
     ToggleBtn.Text = "P"
     ToggleBtn.TextScaled = true
     ToggleBtn.Font = Enum.Font.GothamBlack
