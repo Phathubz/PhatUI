@@ -1,11 +1,10 @@
 --[[
   ██████╗ ██╗  ██╗ █████╗ ████████╗    ██╗   ██╗██╗
-  Phat UI v4.0  ·  Red & Black
-  Fixes:
-    • Không có subtitle (bỏ hoàn toàn)
-    • TopBar full width, nút X không bị cắt
-    • Kéo chỉ bằng TopBar
+  Phat UI v5.0  ·  Red & Black
+  Features:
     • Thông báo có đếm ngược + progress bar
+    • Floating toggle button để bật/tắt UI
+    • TopBar full width, kéo được bằng TopBar
     • Màu đỏ đen ngầu
 --]]
 
@@ -15,6 +14,7 @@ Phat.__index = Phat
 local TweenService = game:GetService("TweenService")
 local UIS          = game:GetService("UserInputService")
 local Players      = game:GetService("Players")
+local RunService   = game:GetService("RunService")
 
 local Player    = Players.LocalPlayer
 local PlayerGui = Player:WaitForChild("PlayerGui")
@@ -32,17 +32,14 @@ local C = {
     RED2    = Color3.fromRGB(255,  68,  68),
     DARKRED = Color3.fromRGB(102,  10,  10),
 
-    -- status
     GREEN   = Color3.fromRGB( 34, 204, 100),
     BLUE    = Color3.fromRGB( 51, 153, 255),
     AMBER   = Color3.fromRGB(204, 136,   0),
 
-    -- text
     T1 = Color3.fromRGB(238, 238, 238),
     T2 = Color3.fromRGB(170, 155, 155),
     T3 = Color3.fromRGB( 90,  70,  70),
 
-    -- structure
     DIV  = Color3.fromRGB(30, 20, 20),
     BOR  = Color3.fromRGB(42, 21, 21),
 }
@@ -121,10 +118,10 @@ local function attachDrag(Main, TopBar)
 end
 
 -- ─── Notification system ──────────────────────
--- Duration: số giây hiển thị (default 4)
-local _nh  -- holder
+local _nh
+local _notifications = {}
 
-local function notify(title, msg, ntype, duration)
+local function notify(title, msg, ntype, duration, extra)
     if not _nh then return end
     duration = duration or 4
 
@@ -135,15 +132,18 @@ local function notify(title, msg, ntype, duration)
         warn    = C.AMBER,
     })[ntype or "info"] or C.RED
 
-    -- Card
+    local notifId = tick()
+    local notifData = { id = notifId, remaining = duration, card = nil }
+    table.insert(_notifications, notifData)
+
     local card = Instance.new("Frame", _nh)
     card.Size             = UDim2.new(1, 0, 0, 64)
     card.BackgroundColor3 = C.WIN
     card.BorderSizePixel  = 0
     corner(card, 9)
     stroke(card, accent, 1)
+    notifData.card = card
 
-    -- left colour strip
     local strip = Instance.new("Frame", card)
     strip.Size             = UDim2.new(0, 3, 1, -14)
     strip.Position         = UDim2.new(0, 0, 0, 7)
@@ -151,13 +151,12 @@ local function notify(title, msg, ntype, duration)
     strip.BorderSizePixel  = 0
     corner(strip, 2)
 
-    -- type badge
     local badge = Instance.new("TextLabel", card)
     badge.Size             = UDim2.fromOffset(58, 14)
     badge.Position         = UDim2.new(0, 10, 0, 8)
     badge.BackgroundColor3 = accent
     badge.BackgroundTransparency = 0.75
-    badge.Text             = string.upper(ntype or "info")
+    badge.Text             = string.upper(ntype or "INFO")
     badge.TextColor3       = accent
     badge.TextSize         = 9
     badge.Font             = Enum.Font.GothamBold
@@ -165,7 +164,6 @@ local function notify(title, msg, ntype, duration)
     badge.BorderSizePixel  = 0
     corner(badge, 3)
 
-    -- countdown label
     local countdown = Instance.new("TextLabel", card)
     countdown.Size             = UDim2.fromOffset(28, 14)
     countdown.Position         = UDim2.new(1, -32, 0, 8)
@@ -176,7 +174,6 @@ local function notify(title, msg, ntype, duration)
     countdown.Font             = Enum.Font.GothamBold
     countdown.TextXAlignment   = Enum.TextXAlignment.Right
 
-    -- title
     mkLabel(card, {
         Text = title or "",
         Size = UDim2.new(1, -14, 0, 18),
@@ -186,7 +183,6 @@ local function notify(title, msg, ntype, duration)
         TextXAlignment = Enum.TextXAlignment.Left,
     })
 
-    -- message
     mkLabel(card, {
         Text = msg or "",
         Size = UDim2.new(1, -14, 0, 14),
@@ -196,7 +192,6 @@ local function notify(title, msg, ntype, duration)
         TextXAlignment = Enum.TextXAlignment.Left,
     })
 
-    -- progress bar track
     local pTrack = Instance.new("Frame", card)
     pTrack.Size             = UDim2.new(1, 0, 0, 2)
     pTrack.Position         = UDim2.new(0, 0, 1, -2)
@@ -208,30 +203,63 @@ local function notify(title, msg, ntype, duration)
     pFill.BackgroundColor3 = accent
     pFill.BorderSizePixel  = 0
 
-    -- slide in
     card.Position = UDim2.new(1.15, 0, 0, 0)
     tw(card, {Position = UDim2.new(0, 0, 0, 0)}, .28, Enum.EasingStyle.Quint)
 
-    -- animate progress bar
     tw(pFill, {Size = UDim2.new(0, 0, 1, 0)}, duration, Enum.EasingStyle.Linear)
 
-    -- countdown tick
-    local remaining = duration
     local function tick()
-        remaining = remaining - 1
+        notifData.remaining = notifData.remaining - 1
         if countdown and countdown.Parent then
-            countdown.Text = math.max(0, remaining) .. "s"
+            countdown.Text = math.max(0, notifData.remaining) .. "s"
         end
     end
     for i = 1, duration do
         task.delay(i, tick)
     end
 
-    -- auto dismiss
-    task.delay(duration, function()
+    local function dismiss()
+        if not card or not card.Parent then return end
         tw(card, {Position = UDim2.new(1.15, 0, 0, 0)}, .24, Enum.EasingStyle.Quint)
-        task.delay(.26, function() card:Destroy() end)
-    end)
+        task.delay(.26, function()
+            if card and card.Parent then
+                card:Destroy()
+            end
+            for i, n in ipairs(_notifications) do
+                if n.id == notifId then
+                    table.remove(_notifications, i)
+                    break
+                end
+            end
+        end)
+    end
+
+    task.delay(duration, dismiss)
+
+    return {
+        Dismiss = dismiss,
+        UpdateTime = function(newDuration)
+            duration = newDuration
+            notifData.remaining = newDuration
+            countdown.Text = tostring(newDuration) .. "s"
+        end,
+        Update = function(newTitle, newMsg, newType)
+            if newTitle and card then
+                for _, child in ipairs(card:GetChildren()) do
+                    if child:IsA("TextLabel") and child.Text ~= "" and child.Position.Y.Offset == 24 then
+                        child.Text = newTitle
+                    end
+                end
+            end
+            if newMsg and card then
+                for _, child in ipairs(card:GetChildren()) do
+                    if child:IsA("TextLabel") and child.Text ~= "" and child.Position.Y.Offset == 44 then
+                        child.Text = newMsg
+                    end
+                end
+            end
+        end
+    }
 end
 
 -- ═════════════════════════════════════════════
@@ -243,13 +271,20 @@ function Phat:CreateWindow(cfg)
     local H  = cfg.Height or 500
     local SW = cfg.SidebarWidth or 160
 
-    local Window = { _tabs = {}, Notify = notify }
+    local Window = { 
+        _tabs = {}, 
+        Notify = notify,
+        _visible = true,
+        _floatingButton = nil,
+        _mainGui = nil,
+    }
 
     local sg = Instance.new("ScreenGui", PlayerGui)
-    sg.Name = "PhatUI"; sg.ResetOnSpawn = false
+    sg.Name = "PhatUI_v5"; sg.ResetOnSpawn = false
     sg.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    Window._mainGui = sg
 
-    -- notification holder (bottom-right)
+    -- notification holder
     _nh = Instance.new("Frame", sg)
     _nh.Size     = UDim2.fromOffset(280, 360)
     _nh.Position = UDim2.new(1, -294, 1, -376)
@@ -266,11 +301,12 @@ function Phat:CreateWindow(cfg)
     Main.AnchorPoint      = Vector2.new(.5, .5)
     Main.BackgroundColor3 = C.WIN
     Main.ClipsDescendants = true
+    Main.Visible          = true
+    Main.ZIndex           = 1
     corner(Main, 12)
     stroke(Main, C.BOR, 1.5)
 
     -- ── TopBar ─────────────────────────────────
-    -- PENTING: ukuran tepat, ClipsDescendants=false agar tombol tidak terpotong
     local TopBar = Instance.new("Frame", Main)
     TopBar.Name             = "TopBar"
     TopBar.Size             = UDim2.new(1, 0, 0, 48)
@@ -280,7 +316,6 @@ function Phat:CreateWindow(cfg)
     TopBar.ZIndex           = 5
     TopBar.ClipsDescendants = false
 
-    -- bottom accent line
     local aLine = Instance.new("Frame", TopBar)
     aLine.Size             = UDim2.new(1, 0, 0, 2)
     aLine.Position         = UDim2.new(0, 0, 1, -2)
@@ -295,7 +330,6 @@ function Phat:CreateWindow(cfg)
         ColorSequenceKeypoint.new(1,   Color3.fromRGB(60,  0,  0)),
     }
 
-    -- dot logo
     local dot = Instance.new("Frame", TopBar)
     dot.Size             = UDim2.fromOffset(9, 9)
     dot.Position         = UDim2.new(0, 14, .5, -4)
@@ -304,7 +338,6 @@ function Phat:CreateWindow(cfg)
     dot.ZIndex           = 6
     corner(dot, 5)
 
-    -- title only (NO subtitle)
     mkLabel(TopBar, {
         Text  = cfg.Title or "PHAT UI",
         Size  = UDim2.new(1, -130, 1, 0),
@@ -315,7 +348,6 @@ function Phat:CreateWindow(cfg)
         ZIndex = 6,
     })
 
-    -- window control buttons — fixed positions dari kanan
     local function wBtn(xOff, sym, nc, hc, tc)
         local b = Instance.new("TextButton", TopBar)
         b.Size             = UDim2.fromOffset(28, 28)
@@ -335,7 +367,6 @@ function Phat:CreateWindow(cfg)
         return b
     end
 
-    -- Spacing: Close at -12, Max at -46, Min at -80
     local BClose = wBtn(-12, "✕", Color3.fromRGB(50,14,14), C.RED,   C.RED)
     local BMax   = wBtn(-46, "□", C.ELEM, C.ELEMH, C.T3)
     local BMin   = wBtn(-80, "─", C.ELEM, C.ELEMH, C.T3)
@@ -350,12 +381,10 @@ function Phat:CreateWindow(cfg)
     Sidebar.BackgroundColor3 = C.SIDE
     Sidebar.BorderSizePixel  = 0
 
-    -- right divider
     local sd = Instance.new("Frame", Sidebar)
     sd.Size = UDim2.new(0, 1, 1, 0); sd.Position = UDim2.new(1, -1, 0, 0)
     sd.BackgroundColor3 = C.DIV; sd.BorderSizePixel = 0
 
-    -- sidebar header
     mkLabel(Sidebar, {
         Text = "NAVIGATE",
         Size = UDim2.new(1, 0, 0, 14), Position = UDim2.new(0, 14, 0, 10),
@@ -385,6 +414,163 @@ function Phat:CreateWindow(cfg)
     vlist(Content, 8)
     pad(Content, 10, 10, 10, 10)
 
+    -- ══════════════════════════════════════════
+    --  FLOATING TOGGLE BUTTON
+    -- ══════════════════════════════════════════
+    local CoreGui = game:GetService("CoreGui")
+    local ToggleGui = Instance.new("ScreenGui")
+    ToggleGui.Name = "PhatFloatingUI_v5"
+    ToggleGui.Parent = CoreGui
+    ToggleGui.ResetOnSpawn = false
+    ToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+    local ToggleBtn = Instance.new("TextButton", ToggleGui)
+    ToggleBtn.Name  = "ToggleButton"
+    ToggleBtn.Size  = UDim2.new(0, 55, 0, 55)
+    ToggleBtn.Position = UDim2.new(0, 20, 0.5, -27)
+    ToggleBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    ToggleBtn.Text  = "P"
+    ToggleBtn.TextScaled = true
+    ToggleBtn.Font  = Enum.Font.GothamBlack
+    ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ToggleBtn.Active = true
+    ToggleBtn.AutoButtonColor = false
+    corner(ToggleBtn, 8)
+
+    local BtnGradient = Instance.new("UIGradient", ToggleBtn)
+    BtnGradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(80, 80, 80)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(30, 30, 30))
+    }
+
+    local BtnStroke = Instance.new("UIStroke", ToggleBtn)
+    BtnStroke.Thickness = 2
+    BtnStroke.Color = Color3.fromRGB(120, 120, 120)
+
+    local btnDragging = false
+    local btnDragStart, btnStartPos
+
+    ToggleBtn.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            btnDragging = true
+            btnDragStart = input.Position
+            btnStartPos = ToggleBtn.Position
+        end
+    end)
+
+    ToggleBtn.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            btnDragging = false
+        end
+    end)
+
+    UIS.InputChanged:Connect(function(input)
+        if btnDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local delta = input.Position - btnDragStart
+            ToggleBtn.Position = UDim2.new(
+                btnStartPos.X.Scale,
+                btnStartPos.X.Offset + delta.X,
+                btnStartPos.Y.Scale,
+                btnStartPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+
+    ToggleBtn.MouseButton1Click:Connect(function()
+        Window._visible = not Window._visible
+        Main.Visible = Window._visible
+        
+        if Window._visible then
+            BtnGradient.Color = ColorSequence.new{
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(80, 80, 80)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(30, 30, 30))
+            }
+            BtnStroke.Color = Color3.fromRGB(120, 120, 120)
+            ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        else
+            BtnGradient.Color = ColorSequence.new{
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 85, 0)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0))
+            }
+            BtnStroke.Color = Color3.fromRGB(255, 120, 0)
+            ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        end
+    end)
+
+    ToggleBtn.MouseEnter:Connect(function()
+        TweenService:Create(ToggleBtn, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 65, 0, 65)
+        }):Play()
+        
+        BtnGradient.Color = ColorSequence.new{
+            ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 85, 0)),
+            ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0))
+        }
+        BtnStroke.Color = Color3.fromRGB(255, 120, 0)
+    end)
+
+    ToggleBtn.MouseLeave:Connect(function()
+        TweenService:Create(ToggleBtn, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 55, 0, 55)
+        }):Play()
+        
+        if Window._visible then
+            BtnGradient.Color = ColorSequence.new{
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(80, 80, 80)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(30, 30, 30))
+            }
+            BtnStroke.Color = Color3.fromRGB(120, 120, 120)
+        end
+    end)
+
+    Window._floatingButton = ToggleBtn
+
+    function Window:Toggle()
+        Window._visible = not Window._visible
+        Main.Visible = Window._visible
+        
+        if Window._visible then
+            BtnGradient.Color = ColorSequence.new{
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(80, 80, 80)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(30, 30, 30))
+            }
+            BtnStroke.Color = Color3.fromRGB(120, 120, 120)
+            ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        else
+            BtnGradient.Color = ColorSequence.new{
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 85, 0)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0))
+            }
+            BtnStroke.Color = Color3.fromRGB(255, 120, 0)
+            ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        end
+        return Window._visible
+    end
+
+    function Window:Show()
+        Window._visible = true
+        Main.Visible = true
+        BtnGradient.Color = ColorSequence.new{
+            ColorSequenceKeypoint.new(0, Color3.fromRGB(80, 80, 80)),
+            ColorSequenceKeypoint.new(1, Color3.fromRGB(30, 30, 30))
+        }
+        BtnStroke.Color = Color3.fromRGB(120, 120, 120)
+    end
+
+    function Window:Hide()
+        Window._visible = false
+        Main.Visible = false
+        BtnGradient.Color = ColorSequence.new{
+            ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 85, 0)),
+            ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0))
+        }
+        BtnStroke.Color = Color3.fromRGB(255, 120, 0)
+    end
+
+    function Window:IsVisible()
+        return Window._visible
+    end
+
     -- ── AddTab ─────────────────────────────────
     local tabIdx = 0
 
@@ -404,7 +590,6 @@ function Phat:CreateWindow(cfg)
         TBtn.LayoutOrder      = mi
         corner(TBtn, 8)
 
-        -- left active bar
         local lBar = Instance.new("Frame", TBtn)
         lBar.Size             = UDim2.new(0, 3, .6, 0)
         lBar.Position         = UDim2.new(0, 0, .2, 0)
@@ -413,7 +598,6 @@ function Phat:CreateWindow(cfg)
         lBar.Visible          = false
         corner(lBar, 2)
 
-        -- icon bg
         local icoBG = Instance.new("Frame", TBtn)
         icoBG.Size             = UDim2.fromOffset(26, 26)
         icoBG.Position         = UDim2.new(0, 10, .5, -13)
@@ -476,7 +660,6 @@ function Phat:CreateWindow(cfg)
         if tabIdx == 1 then task.defer(activate) end
         table.insert(Window._tabs, Tab)
 
-        -- ── AddSection ─────────────────────────
         local secIdx = 0
         function Tab:AddSection(title)
             secIdx = secIdx + 1
@@ -492,7 +675,6 @@ function Phat:CreateWindow(cfg)
             corner(SF, 10)
             stroke(SF, C.BOR, 1)
 
-            -- top accent line
             local tl = Instance.new("Frame", SF)
             tl.Size             = UDim2.new(1, 0, 0, 1)
             tl.BackgroundColor3 = C.RED
@@ -504,7 +686,6 @@ function Phat:CreateWindow(cfg)
                 ColorSequenceKeypoint.new(1, Color3.fromRGB(0,0,0)),
             }
 
-            -- header
             local hRow = Instance.new("Frame", SF)
             hRow.Size             = UDim2.new(1, 0, 0, 34)
             hRow.BackgroundTransparency = 1
@@ -525,7 +706,6 @@ function Phat:CreateWindow(cfg)
                 TextXAlignment = Enum.TextXAlignment.Left,
             })
 
-            -- divider
             local div = Instance.new("Frame", SF)
             div.Size             = UDim2.new(1, -18, 0, 1)
             div.Position         = UDim2.new(0, 9, 0, 34)
@@ -541,7 +721,6 @@ function Phat:CreateWindow(cfg)
 
             local ei = 0
 
-            -- ── AddButton ──────────────────────
             function Sec:AddButton(bc)
                 bc = bc or {}; ei = ei + 1
                 local row = Instance.new("Frame", inner)
@@ -590,7 +769,6 @@ function Phat:CreateWindow(cfg)
                 end)
             end
 
-            -- ── AddToggle ──────────────────────
             function Sec:AddToggle(tc)
                 tc = tc or {}; ei = ei + 1
                 local state = tc.Default or false
@@ -659,7 +837,6 @@ function Phat:CreateWindow(cfg)
                 return { Set = set, Get = function() return state end }
             end
 
-            -- ── AddSlider ──────────────────────
             function Sec:AddSlider(sc)
                 sc = sc or {}; ei = ei + 1
                 local mn, mx = sc.Min or 0, sc.Max or 100
@@ -741,7 +918,6 @@ function Phat:CreateWindow(cfg)
                 }
             end
 
-            -- ── AddInput ───────────────────────
             function Sec:AddInput(ic)
                 ic = ic or {}; ei = ei + 1
                 local wrap = Instance.new("Frame", inner)
@@ -782,7 +958,6 @@ function Phat:CreateWindow(cfg)
                 return { Get = function() return tb.Text end }
             end
 
-            -- ── AddDropdown ────────────────────
             function Sec:AddDropdown(dc)
                 dc = dc or {}; ei = ei + 1
                 local sel, open = dc.Default, false
@@ -863,9 +1038,9 @@ function Phat:CreateWindow(cfg)
             end
 
             return Sec
-        end -- AddSection
+        end
         return Tab
-    end -- AddTab
+    end
 
     -- ── Window controls ────────────────────────
     local minimized = false; local maximized = false
@@ -897,10 +1072,12 @@ function Phat:CreateWindow(cfg)
 
     BClose.MouseButton1Click:Connect(function()
         tw(Main, {Size = UDim2.fromOffset(W,0), BackgroundTransparency=1}, .2, Enum.EasingStyle.Quart)
-        task.delay(.22, function() sg:Destroy() end)
+        task.delay(.22, function()
+            sg:Destroy()
+            ToggleGui:Destroy()
+        end)
     end)
 
-    -- Entry animation
     Main.BackgroundTransparency = 1
     Main.Size = UDim2.fromOffset(W*.86, H*.86)
     tw(Main, {Size = UDim2.fromOffset(W,H), BackgroundTransparency=0}, .3, Enum.EasingStyle.Quint)
@@ -909,6 +1086,7 @@ function Phat:CreateWindow(cfg)
 end
 
 return Phat
+
 
 --[[
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
