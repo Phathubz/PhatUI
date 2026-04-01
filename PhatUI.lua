@@ -6,7 +6,7 @@
     • Nút X không bị cắt
     • Kéo UI từ mọi cạnh/rìa
     • Floating toggle button
-    • Multiple tab assignment support
+    • Horizontal scrollable tabs (Discord-style)
 --]]
 
 local Phat = {}
@@ -76,6 +76,14 @@ end
 local function vlist(p, px)
     local l = Instance.new("UIListLayout", p)
     l.FillDirection = Enum.FillDirection.Vertical
+    l.Padding = UDim.new(0, px or 4)
+    l.SortOrder = Enum.SortOrder.LayoutOrder
+    return l
+end
+
+local function hlist(p, px)
+    local l = Instance.new("UIListLayout", p)
+    l.FillDirection = Enum.FillDirection.Horizontal
     l.Padding = UDim.new(0, px or 4)
     l.SortOrder = Enum.SortOrder.LayoutOrder
     return l
@@ -220,7 +228,6 @@ function Phat:CreateWindow(cfg)
     cfg = cfg or {}
     local W = cfg.Width or 640
     local H = cfg.Height or 500
-    local SW = cfg.SidebarWidth or 150
 
     local Window = {
         _tabs = {},
@@ -258,10 +265,10 @@ function Phat:CreateWindow(cfg)
     corner(Main, 14)
     stroke(Main, C.BOR, 1.5)
 
-    -- TopBar
+    -- TopBar (Title + Window Controls)
     local TopBar = Instance.new("Frame")
     TopBar.Name = "TopBar"
-    TopBar.Size = UDim2.new(1, 0, 0, 44)
+    TopBar.Size = UDim2.new(1, 0, 0, 36)
     TopBar.Position = UDim2.new(0, 0, 0, 0)
     TopBar.BackgroundColor3 = C.TOP
     TopBar.BorderSizePixel = 0
@@ -285,7 +292,7 @@ function Phat:CreateWindow(cfg)
 
     mkLabel(TopBar, {
         Text = cfg.Title or "PHAT UI",
-        Size = UDim2.new(1, -120, 1, 0),
+        Size = UDim2.new(0, 100, 1, 0),
         Position = UDim2.new(0, 28, 0, 0),
         TextColor3 = C.T1,
         TextSize = 13,
@@ -347,6 +354,94 @@ function Phat:CreateWindow(cfg)
             )
         end
     end)
+
+    -- Tab Bar (Horizontal scrollable)
+    local TabBar = Instance.new("Frame")
+    TabBar.Name = "TabBar"
+    TabBar.Size = UDim2.new(1, 0, 0, 42)
+    TabBar.Position = UDim2.new(0, 0, 0, 36)
+    TabBar.BackgroundColor3 = C.SIDE
+    TabBar.BorderSizePixel = 0
+    TabBar.Parent = Main
+
+    local tabBarDivider = Instance.new("Frame")
+    tabBarDivider.Size = UDim2.new(1, 0, 0, 1)
+    tabBarDivider.Position = UDim2.new(0, 0, 1, -1)
+    tabBarDivider.BackgroundColor3 = C.DIV
+    tabBarDivider.BorderSizePixel = 0
+    tabBarDivider.Parent = TabBar
+
+    local TabScroll = Instance.new("ScrollingFrame")
+    TabScroll.Name = "TabScroll"
+    TabScroll.Size = UDim2.new(1, -60, 1, 0)
+    TabScroll.Position = UDim2.new(0, 8, 0, 0)
+    TabScroll.BackgroundTransparency = 1
+    TabScroll.BorderSizePixel = 0
+    TabScroll.ScrollBarThickness = 0
+    TabScroll.ScrollBarImageTransparency = 1
+    TabScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+    TabScroll.AutomaticCanvasSize = Enum.AutomaticSize.X
+    TabScroll.Parent = TabBar
+
+    local TabLayout = hlist(TabScroll, 4)
+
+    local TabContainer = Instance.new("Frame")
+    TabContainer.Size = UDim2.new(1, -60, 1, 0)
+    TabContainer.Position = UDim2.new(0, 8, 0, 0)
+    TabContainer.BackgroundTransparency = 1
+    TabContainer.Parent = TabBar
+    TabContainer.ScrollingEnabled = false
+    vlist(TabContainer, 4)
+    TabContainer.AutomaticCanvasSize = Enum.AutomaticSize.X
+
+    local TabScrollContainer = Instance.new("ScrollingFrame")
+    TabScrollContainer.Name = "TabScrollContainer"
+    TabScrollContainer.Size = UDim2.new(1, -60, 1, 0)
+    TabScrollContainer.Position = UDim2.new(0, 8, 0, 0)
+    TabScrollContainer.BackgroundTransparency = 1
+    TabScrollContainer.BorderSizePixel = 0
+    TabScrollContainer.ScrollBarThickness = 0
+    TabScrollContainer.ScrollBarImageTransparency = 1
+    TabScrollContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
+    TabScrollContainer.AutomaticCanvasSize = Enum.AutomaticSize.X
+    TabScrollContainer.Parent = TabBar
+    TabScrollContainer.ScrollingEnabled = true
+
+    local TabScrollLayout = hlist(TabScrollContainer, 4)
+
+    local function scrollTabs(dir)
+        local target = TabScrollContainer.CanvasPosition.X + (dir * 100)
+        target = math.max(0, math.min(target, TabScrollContainer.AbsoluteCanvasSize.X - TabScrollContainer.AbsoluteSize.X))
+        tw(TabScrollContainer, {CanvasPosition = Vector2.new(target, 0)}, 0.15, Enum.EasingStyle.Quart)
+    end
+
+    local ScrollLeftBtn = Instance.new("TextButton")
+    ScrollLeftBtn.Size = UDim2.fromOffset(24, 24)
+    ScrollLeftBtn.Position = UDim2.new(0, 8, 0.5, -12)
+    ScrollLeftBtn.BackgroundColor3 = C.ELEM
+    ScrollLeftBtn.Text = "‹"
+    ScrollLeftBtn.TextSize = 18
+    ScrollLeftBtn.Font = Enum.Font.GothamBold
+    ScrollLeftBtn.TextColor3 = C.T2
+    ScrollLeftBtn.BorderSizePixel = 0
+    ScrollLeftBtn.AutoButtonColor = false
+    corner(ScrollLeftBtn, 6)
+    ScrollLeftBtn.Parent = TabBar
+    ScrollLeftBtn.MouseButton1Click:Connect(function() scrollTabs(-1) end)
+
+    local ScrollRightBtn = Instance.new("TextButton")
+    ScrollRightBtn.Size = UDim2.fromOffset(24, 24)
+    ScrollRightBtn.Position = UDim2.new(1, -32, 0.5, -12)
+    ScrollRightBtn.BackgroundColor3 = C.ELEM
+    ScrollRightBtn.Text = "›"
+    ScrollRightBtn.TextSize = 18
+    ScrollRightBtn.Font = Enum.Font.GothamBold
+    ScrollRightBtn.TextColor3 = C.T2
+    ScrollRightBtn.BorderSizePixel = 0
+    ScrollRightBtn.AutoButtonColor = false
+    corner(ScrollRightBtn, 6)
+    ScrollRightBtn.Parent = TabBar
+    ScrollRightBtn.MouseButton1Click:Connect(function() scrollTabs(1) end)
 
     -- Edge Drag
     local EDGE_SIZE = 10
@@ -430,45 +525,12 @@ function Phat:CreateWindow(cfg)
             resizing = nil
         end
     end)
-    -- Sidebar
-    local Sidebar = Instance.new("Frame")
-    Sidebar.Name = "Sidebar"
-    Sidebar.Size = UDim2.new(0, SW, 1, -44)
-    Sidebar.Position = UDim2.new(0, 0, 0, 44)
-    Sidebar.BackgroundColor3 = C.SIDE
-    Sidebar.BorderSizePixel = 0
-    Sidebar.Parent = Main
-
-    local sideDivider = Instance.new("Frame")
-    sideDivider.Size = UDim2.new(0, 1, 1, 0)
-    sideDivider.Position = UDim2.new(1, -1, 0, 0)
-    sideDivider.BackgroundColor3 = C.DIV
-    sideDivider.BorderSizePixel = 0
-    sideDivider.Parent = Sidebar
-
-    mkLabel(Sidebar, {
-        Text = "NAVIGATE",
-        Size = UDim2.new(1, 0, 0, 12),
-        Position = UDim2.new(0, 12, 0, 8),
-        TextColor3 = Color3.fromRGB(60, 30, 30),
-        TextSize = 9,
-        Font = Enum.Font.GothamBold,
-        TextXAlignment = Enum.TextXAlignment.Left,
-    })
-
-    local tabContainer = Instance.new("Frame")
-    tabContainer.Size = UDim2.new(1, 0, 1, -28)
-    tabContainer.Position = UDim2.new(0, 0, 0, 26)
-    tabContainer.BackgroundTransparency = 1
-    tabContainer.Parent = Sidebar
-    vlist(tabContainer, 4)
-    pad(tabContainer, 2, 6, 6, 6)
 
     -- Content
     local Content = Instance.new("ScrollingFrame")
     Content.Name = "Content"
-    Content.Size = UDim2.new(1, -SW, 1, -44)
-    Content.Position = UDim2.new(0, SW, 0, 44)
+    Content.Size = UDim2.new(1, 0, 1, -82)
+    Content.Position = UDim2.new(0, 0, 0, 82)
     Content.BackgroundTransparency = 1
     Content.BorderSizePixel = 0
     Content.ScrollBarThickness = 3
@@ -626,37 +688,28 @@ function Phat:CreateWindow(cfg)
 
         local TBtn = Instance.new("TextButton")
         TBtn.Name = "Tab" .. mi
-        TBtn.Size = UDim2.new(1, 0, 0, 38)
+        TBtn.Size = UDim2.new(0, 90, 0, 32)
         TBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
         TBtn.BackgroundTransparency = 1
         TBtn.Text = ""
         TBtn.BorderSizePixel = 0
         TBtn.LayoutOrder = mi
-        corner(TBtn, 8)
-        TBtn.Parent = tabContainer
+        corner(TBtn, 6)
+        TBtn.Parent = TabScrollContainer
 
-        local lBar = Instance.new("Frame")
-        lBar.Size = UDim2.new(0, 3, 0.6, 0)
-        lBar.Position = UDim2.new(0, 0, 0.2, 0)
-        lBar.BackgroundColor3 = C.RED
-        lBar.BorderSizePixel = 0
-        lBar.Visible = false
-        corner(lBar, 2)
-        lBar.Parent = TBtn
+        local indicator = Instance.new("Frame")
+        indicator.Size = UDim2.new(1, 0, 0, 2)
+        indicator.Position = UDim2.new(0, 0, 1, 0)
+        indicator.BackgroundColor3 = C.RED
+        indicator.BorderSizePixel = 0
+        indicator.Visible = false
+        indicator.Parent = TBtn
 
-        local icoBg = Instance.new("Frame")
-        icoBg.Size = UDim2.fromOffset(24, 24)
-        icoBg.Position = UDim2.new(0, 8, 0.5, -12)
-        icoBg.BackgroundColor3 = C.DARKRED
-        icoBg.BackgroundTransparency = 0.4
-        icoBg.BorderSizePixel = 0
-        corner(icoBg, 6)
-        icoBg.Parent = TBtn
-
-        mkLabel(icoBg, {
+        local iconLbl = mkLabel(TBtn, {
             Text = cfg.Icon or "●",
-            Size = UDim2.new(1, 0, 1, 0),
-            TextColor3 = C.T2,
+            Size = UDim2.new(0, 20, 1, 0),
+            Position = UDim2.new(0, 8, 0, 0),
+            TextColor3 = C.T3,
             TextSize = 12,
             Font = Enum.Font.GothamBold,
             TextXAlignment = Enum.TextXAlignment.Center,
@@ -664,12 +717,13 @@ function Phat:CreateWindow(cfg)
 
         local tLbl = mkLabel(TBtn, {
             Text = cfg.Title or ("Tab " .. mi),
-            Size = UDim2.new(1, -46, 1, 0),
-            Position = UDim2.new(0, 40, 0, 0),
+            Size = UDim2.new(1, -30, 1, 0),
+            Position = UDim2.new(0, 26, 0, 0),
             TextColor3 = C.T3,
             TextSize = 11,
             Font = Enum.Font.GothamBold,
             TextXAlignment = Enum.TextXAlignment.Left,
+            TextTruncate = Enum.TextTruncate.AtEnd,
         })
 
         local Page = Instance.new("Frame")
@@ -685,22 +739,25 @@ function Phat:CreateWindow(cfg)
         local function activate()
             for _, t in ipairs(Window._tabs) do
                 t._page.Visible = false
-                t._lbar.Visible = false
+                t._indicator.Visible = false
                 tw(t._btn, {BackgroundTransparency = 1}, 0.12)
                 tw(t._lbl, {TextColor3 = C.T3}, 0.12)
+                tw(t._icon, {TextColor3 = C.T3}, 0.12)
             end
             Page.Visible = true
             Page.BackgroundTransparency = 1
             tw(Page, {BackgroundTransparency = 0}, 0.2)
-            lBar.Visible = true
+            indicator.Visible = true
             tw(TBtn, {BackgroundColor3 = C.ELEMH, BackgroundTransparency = 0}, 0.12)
             tw(tLbl, {TextColor3 = C.RED2}, 0.12)
+            tw(iconLbl, {TextColor3 = C.RED2}, 0.12)
         end
 
         Tab._page = Page
         Tab._btn = TBtn
-        Tab._lbar = lBar
+        Tab._indicator = indicator
         Tab._lbl = tLbl
+        Tab._icon = iconLbl
 
         TBtn.MouseButton1Click:Connect(activate)
         TBtn.MouseEnter:Connect(function()
@@ -1236,14 +1293,14 @@ function Phat:CreateWindow(cfg)
         minimized = not minimized
         if minimized then
             Content.Visible = false
-            Sidebar.Visible = false
-            tw(Main, {Size = UDim2.new(0, W, 0, 44)}, 0.2, Enum.EasingStyle.Quart)
+            TabBar.Visible = false
+            tw(Main, {Size = UDim2.new(0, W, 0, 36)}, 0.2, Enum.EasingStyle.Quart)
         else
             local newSize = maximized and UDim2.new(1, -20, 1, -20) or origSize
             tw(Main, {Size = newSize}, 0.2, Enum.EasingStyle.Quart)
             task.delay(0.1, function()
                 Content.Visible = true
-                Sidebar.Visible = true
+                TabBar.Visible = true
             end)
         end
     end)
