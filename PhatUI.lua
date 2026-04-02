@@ -1,3 +1,152 @@
+--[[
+local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Phathubz/PhatUI/refs/heads/main/PhatUI.lua"))()
+
+local win = UI:CreateWindow({
+    Title = "PHAT UI v7",
+    Width = 640,
+    Height = 500,
+})
+
+local Tab = {
+    Main = win:AddTab({Title = "Main"}),
+    Combat = win:AddTab({Title = "Combat"}),
+    Teleport = win:AddTab({Title = "Teleport"}),
+    Settings = win:AddTab({Title = "Settings"}),
+}
+
+local MainSection = Tab.Main:AddSection("Welcome")
+
+MainSection:AddButton({
+    Title = "Test Notification",
+    Callback = function()
+        win:Notify("Success!", "Notification đang hoạt động!", "success", 4)
+    end,
+})
+
+MainSection:AddToggle({
+    Title = "Example Toggle",
+    Default = false,
+    Callback = function(v)
+        win:Notify("Toggle", v and "Bật" or "Tắt", v and "success" or "warn", 3)
+    end,
+})
+
+MainSection:AddSlider({
+    Title = "Example Slider",
+    Min = 0,
+    Max = 100,
+    Default = 50,
+    Callback = function(v)
+    end,
+})
+
+MainSection:AddDropdown({
+    Title = "Example Dropdown",
+    Items = {"Option 1", "Option 2", "Option 3"},
+    Default = "Option 1",
+    Callback = function(v)
+        win:Notify("Dropdown", "Đã chọn: " .. v, "info", 2)
+    end,
+})
+
+MainSection:AddInput({
+    Title = "Example Input",
+    Placeholder = "Nhập text...",
+    Callback = function(text, enter)
+        if enter then
+            win:Notify("Input", "Text: " .. text, "info", 3)
+        end
+    end,
+})
+
+local CombatSection = Tab.Combat:AddSection("Combat Options")
+
+CombatSection:AddButton({
+    Title = "Kill Aura",
+    Callback = function()
+        win:Notify("Kill Aura", "Đã kích hoạt Kill Aura!", "success", 4)
+    end,
+})
+
+CombatSection:AddButton({
+    Title = "Auto Attack",
+    Callback = function()
+        win:Notify("Auto Attack", "Đang tấn công...", "info", 3)
+    end,
+})
+
+CombatSection:AddToggle({
+    Title = "Infinite Jump",
+    Default = false,
+    Callback = function(v)
+        win:Notify("Infinite Jump", v and "Đã bật" or "Đã tắt", v and "success" or "warn", 3)
+    end,
+})
+
+CombatSection:AddSlider({
+    Title = "Reach Distance",
+    Min = 3,
+    Max = 20,
+    Default = 3,
+    Callback = function(v)
+    end,
+})
+
+local TeleSection = Tab.Teleport:AddSection("Teleport Options")
+
+TeleSection:AddDropdown({
+    Title = "Teleport To",
+    Items = {"Spawn", "Nearest Player", "Random Player"},
+    Default = "Spawn",
+    Callback = function(v)
+        win:Notify("Teleport", "Chế độ: " .. v, "info", 2)
+    end,
+})
+
+TeleSection:AddInput({
+    Title = "Player Name",
+    Placeholder = "Nhập tên player...",
+    Callback = function(text, enter)
+        if enter and text ~= "" then
+            win:Notify("Teleport", "Đang teleport đến: " .. text, "success", 3)
+        end
+    end,
+})
+
+local SettingsSection = Tab.Settings:AddSection("UI Settings")
+
+SettingsSection:AddButton({
+    Title = "Hide UI (Toggle Button)",
+    Callback = function()
+        win:Toggle()
+    end,
+})
+
+SettingsSection:AddButton({
+    Title = "Show UI",
+    Callback = function()
+        win:Show()
+    end,
+})
+
+SettingsSection:AddButton({
+    Title = "Hide UI",
+    Callback = function()
+        win:Hide()
+    end,
+})
+
+SettingsSection:AddToggle({
+    Title = "Test Toggle",
+    Default = true,
+    Callback = function(v)
+    end,
+})
+
+win:Notify("Loaded", "PhatUI v7.0 đã sẵn sàng!", "success", 5)
+
+--]]
+
 local Phat = {}
 Phat.__index = Phat
 Phat.Options = {}
@@ -1286,4 +1435,3 @@ function Phat:CreateWindow(cfg)
 
     return Window
 end
-return Phat
