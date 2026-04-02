@@ -1435,5 +1435,3 @@ function Phat:CreateWindow(cfg)
 
     return Window
 end
-
-return Phat
