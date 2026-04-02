@@ -997,9 +997,12 @@ function Phat:CreateWindow(cfg)
                     tw(arr, {TextColor3 = C.T3}, 0.12)
                 end)
             end
-
-            -- AddToggle
-            function Sec:AddToggle(tc)
+            -- Add Toggle
+            function Sec:AddToggle(name, tc)
+                if type(name) == "table" then
+                    tc = name
+                    name = tc.Name
+                end
                 tc = tc or {}
                 ei = ei + 1
                 local state = tc.Default or false
@@ -1068,10 +1071,14 @@ function Phat:CreateWindow(cfg)
                     Get = function() return state end
                 }
 
-                registerOption(tc.Name, ctrl, "Toggle",
-                    function(v) set(v) end,
-                    function() return state end
-                )
+                if name then
+                    Phat.Options[name] = {
+                        Type = "Toggle",
+                        SetValue = function(v) set(v) end,
+                        GetValue = function() return state end,
+                        _ctrl = ctrl,
+                    }
+                end
 
                 return ctrl
             end
