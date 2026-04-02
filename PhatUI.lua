@@ -149,7 +149,18 @@ win:Notify("Loaded", "PhatUI v7.0 đã sẵn sàng!", "success", 5)
 
 local Phat = {}
 Phat.__index = Phat
+Phat.Options = {}
 
+local function registerOption(name, ctrl, ctrlType, setFn, getFn)
+    if name then
+        Phat.Options[name] = {
+            Type = ctrlType,
+            SetValue = setFn,
+            GetValue = getFn,
+            _ctrl = ctrl,
+        }
+    end
+end
 local TweenService = game:GetService("TweenService")
 local UIS = game:GetService("UserInputService")
 local Players = game:GetService("Players")
@@ -1052,10 +1063,17 @@ function Phat:CreateWindow(cfg)
                     tw(row, {BackgroundColor3 = C.ELEM}, 0.1)
                 end)
 
-                return {
+                local ctrl = {
                     Set = set,
                     Get = function() return state end
                 }
+
+                registerOption(tc.Name, ctrl, "Toggle",
+                    function(v) set(v) end,
+                    function() return state end
+                )
+
+                return ctrl
             end
 
             -- AddSlider
@@ -1211,7 +1229,13 @@ function Phat:CreateWindow(cfg)
                     if ic.Callback then pcall(ic.Callback, tb.Text, enter) end
                 end)
 
-                return {Get = function() return tb.Text end}
+                local ctrl = {Get = function() return tb.Text end}
+                registerOption(ic.Name, ctrl, "Input",
+                    function(v) tb.Text = v end,
+                    function() return tb.Text end
+                )
+
+                return ctrl
             end
 
             -- AddDropdown
@@ -1331,7 +1355,7 @@ function Phat:CreateWindow(cfg)
                         end
                     end
                 end)
-                return {
+                local ctrl = {
                     Get = function() return sel end,
                     Set = function(v)
                         sel = v
@@ -1339,11 +1363,20 @@ function Phat:CreateWindow(cfg)
                         dLbl.TextColor3 = C.T1
                     end,
                     Destroy = function()
-                        if connection then
-                            connection:Disconnect()
-                        end
+                        if connection then connection:Disconnect() end
                     end
                 }
+
+                registerOption(dc.Name, ctrl, "Dropdown",
+                    function(v)
+                        sel = v
+                        dLbl.Text = v
+                        dLbl.TextColor3 = C.T1
+                    end,
+                    function() return sel end
+                )
+
+                return ctrl
             end
             return Sec
         end
