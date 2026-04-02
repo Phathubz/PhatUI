@@ -1012,16 +1012,6 @@ function Phat:CreateWindow(cfg)
                     TextXAlignment = Enum.TextXAlignment.Left,
                 })
 
-                local sLbl = mkLabel(row, {
-                    Text = state and "ON" or "OFF",
-                    Size = UDim2.fromOffset(26, 36),
-                    Position = UDim2.new(1, -80, 0, 0),
-                    TextColor3 = state and C.RED2 or C.T3,
-                    TextSize = 10,
-                    Font = Enum.Font.GothamBold,
-                    TextXAlignment = Enum.TextXAlignment.Center,
-                })
-
                 local track = Instance.new("Frame")
                 track.Size = UDim2.fromOffset(38, 18)
                 track.Position = UDim2.new(1, -46, 0.5, -9)
@@ -1030,7 +1020,6 @@ function Phat:CreateWindow(cfg)
                 corner(track, 9)
                 local tStr = stroke(track, state and C.RED or C.BOR, 1)
                 track.Parent = row
-
                 local knob = Instance.new("Frame")
                 knob.Size = UDim2.fromOffset(12, 12)
                 knob.Position = state and UDim2.new(1, -15, 0.5, -6) or UDim2.new(0, 3, 0.5, -6)
@@ -1045,12 +1034,10 @@ function Phat:CreateWindow(cfg)
                         tw(track, {BackgroundColor3 = C.DARKRED}, 0.16)
                         tw(knob, {Position = UDim2.new(1, -15, 0.5, -6), BackgroundColor3 = C.RED2}, 0.18)
                         tStr.Color = C.RED
-                        --tw(sLbl, {Text = "ON", TextColor3 = C.RED2}, 0.1)
                     else
                         tw(track, {BackgroundColor3 = C.DIV}, 0.16)
                         tw(knob, {Position = UDim2.new(0, 3, 0.5, -6), BackgroundColor3 = C.T3}, 0.18)
                         tStr.Color = C.BOR
-                        --tw(sLbl, {Text = "OFF", TextColor3 = C.T3}, 0.1)
                     end
                     if tc.Callback then pcall(tc.Callback, state) end
                 end
