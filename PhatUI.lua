@@ -369,7 +369,7 @@ function Phat:CreateWindow(cfg)
     }
 
     local sg = Instance.new("ScreenGui")
-    sg.Name = "PhatUI_v7"
+    sg.Name = "PhatUI"
     sg.Parent = PlayerGui
     sg.ResetOnSpawn = false
     sg.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
@@ -458,7 +458,7 @@ function Phat:CreateWindow(cfg)
 
     local BtnMin = makeBtn(-72, "─", C.ELEM, C.ELEMH, C.T3)
     local BtnMax = makeBtn(-42, "□", C.ELEM, C.ELEMH, C.T3)
-    local BtnClose = makeBtn(-12, "✕", Color3.fromRGB(45, 12, 12), C.RED, C.RED)
+    local BtnClose = makeBtn(-12, "X", Color3.fromRGB(45, 12, 12), C.RED, C.RED)
 
     -- TopBar Drag
     local drag = {active = false, startPos = nil, startMainPos = nil}
@@ -620,7 +620,7 @@ function Phat:CreateWindow(cfg)
     -- Floating Toggle Button
     local CoreGui = game:GetService("CoreGui")
     local ToggleGui = Instance.new("ScreenGui")
-    ToggleGui.Name = "PhatToggle_v7"
+    ToggleGui.Name = "PhatToggle"
     ToggleGui.Parent = CoreGui
     ToggleGui.ResetOnSpawn = false
     ToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
@@ -1383,7 +1383,7 @@ function Phat:CreateWindow(cfg)
             BtnMax.Text = "❐"
         else
             tw(Main, {Size = origSize, Position = origPos}, 0.2, Enum.EasingStyle.Quart)
-            BtnMax.Text = "□"
+            BtnMax.Text = "❐"
         end
     end)
 
