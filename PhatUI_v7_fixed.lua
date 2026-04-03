@@ -1097,10 +1097,10 @@ function Phat:CreateWindow(cfg)
 
                 local noiDung = mkLabel(row, {
                     Text = pc.Content or "",
-                    Size = UDim2.new(0.62, -16, 1, 0),
+                    Size = UDim2.new(0.55, -16, 1, 0),
                     Position = UDim2.new(0.45, 4, 0, 0),
                     TextColor3 = C.RED2,
-                    TextSize = 12,
+                    TextSize = 11, -- thêm dòng này
                     Font = Enum.Font.GothamBold,
                     TextXAlignment = Enum.TextXAlignment.Right,
                     TextTruncate = Enum.TextTruncate.AtEnd,
