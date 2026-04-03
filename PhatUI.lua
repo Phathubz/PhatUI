@@ -1,152 +1,3 @@
---[[
-local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Phathubz/PhatUI/refs/heads/main/PhatUI.lua"))()
-
-local win = UI:CreateWindow({
-    Title = "PHAT UI v7",
-    Width = 640,
-    Height = 500,
-})
-
-local Tab = {
-    Main = win:AddTab({Title = "Main"}),
-    Combat = win:AddTab({Title = "Combat"}),
-    Teleport = win:AddTab({Title = "Teleport"}),
-    Settings = win:AddTab({Title = "Settings"}),
-}
-
-local MainSection = Tab.Main:AddSection("Welcome")
-
-MainSection:AddButton({
-    Title = "Test Notification",
-    Callback = function()
-        win:Notify("Success!", "Notification đang hoạt động!", "success", 4)
-    end,
-})
-
-MainSection:AddToggle({
-    Title = "Example Toggle",
-    Default = false,
-    Callback = function(v)
-        win:Notify("Toggle", v and "Bật" or "Tắt", v and "success" or "warn", 3)
-    end,
-})
-
-MainSection:AddSlider({
-    Title = "Example Slider",
-    Min = 0,
-    Max = 100,
-    Default = 50,
-    Callback = function(v)
-    end,
-})
-
-MainSection:AddDropdown({
-    Title = "Example Dropdown",
-    Items = {"Option 1", "Option 2", "Option 3"},
-    Default = "Option 1",
-    Callback = function(v)
-        win:Notify("Dropdown", "Đã chọn: " .. v, "info", 2)
-    end,
-})
-
-MainSection:AddInput({
-    Title = "Example Input",
-    Placeholder = "Nhập text...",
-    Callback = function(text, enter)
-        if enter then
-            win:Notify("Input", "Text: " .. text, "info", 3)
-        end
-    end,
-})
-
-local CombatSection = Tab.Combat:AddSection("Combat Options")
-
-CombatSection:AddButton({
-    Title = "Kill Aura",
-    Callback = function()
-        win:Notify("Kill Aura", "Đã kích hoạt Kill Aura!", "success", 4)
-    end,
-})
-
-CombatSection:AddButton({
-    Title = "Auto Attack",
-    Callback = function()
-        win:Notify("Auto Attack", "Đang tấn công...", "info", 3)
-    end,
-})
-
-CombatSection:AddToggle({
-    Title = "Infinite Jump",
-    Default = false,
-    Callback = function(v)
-        win:Notify("Infinite Jump", v and "Đã bật" or "Đã tắt", v and "success" or "warn", 3)
-    end,
-})
-
-CombatSection:AddSlider({
-    Title = "Reach Distance",
-    Min = 3,
-    Max = 20,
-    Default = 3,
-    Callback = function(v)
-    end,
-})
-
-local TeleSection = Tab.Teleport:AddSection("Teleport Options")
-
-TeleSection:AddDropdown({
-    Title = "Teleport To",
-    Items = {"Spawn", "Nearest Player", "Random Player"},
-    Default = "Spawn",
-    Callback = function(v)
-        win:Notify("Teleport", "Chế độ: " .. v, "info", 2)
-    end,
-})
-
-TeleSection:AddInput({
-    Title = "Player Name",
-    Placeholder = "Nhập tên player...",
-    Callback = function(text, enter)
-        if enter and text ~= "" then
-            win:Notify("Teleport", "Đang teleport đến: " .. text, "success", 3)
-        end
-    end,
-})
-
-local SettingsSection = Tab.Settings:AddSection("UI Settings")
-
-SettingsSection:AddButton({
-    Title = "Hide UI (Toggle Button)",
-    Callback = function()
-        win:Toggle()
-    end,
-})
-
-SettingsSection:AddButton({
-    Title = "Show UI",
-    Callback = function()
-        win:Show()
-    end,
-})
-
-SettingsSection:AddButton({
-    Title = "Hide UI",
-    Callback = function()
-        win:Hide()
-    end,
-})
-
-SettingsSection:AddToggle({
-    Title = "Test Toggle",
-    Default = true,
-    Callback = function(v)
-    end,
-})
-
-win:Notify("Loaded", "PhatUI v7.0 đã sẵn sàng!", "success", 5)
-
---]]
-
 local Phat = {}
 Phat.__index = Phat
 Phat.Options = {}
@@ -169,7 +20,6 @@ local RunService = game:GetService("RunService")
 local Player = Players.LocalPlayer
 local PlayerGui = Player:WaitForChild("PlayerGui")
 
--- Palette: Red & Black
 local C = {
     WIN = Color3.fromRGB(17, 17, 22),
     TOP = Color3.fromRGB(14, 14, 18),
@@ -194,7 +44,6 @@ local C = {
     BOR = Color3.fromRGB(42, 21, 21),
 }
 
--- Helpers
 local function tw(o, p, t, s, d)
     local ti = TweenInfo.new(t or 0.18, s or Enum.EasingStyle.Quart, d or Enum.EasingDirection.Out)
     local tween = TweenService:Create(o, ti, p)
@@ -238,7 +87,6 @@ local function mkLabel(parent, props)
     return l
 end
 
--- Notification System
 local NotificationHolder = nil
 
 local function notify(title, msg, ntype, duration)
@@ -364,7 +212,6 @@ local function notify(title, msg, ntype, duration)
     return card
 end
 
--- CreateWindow
 function Phat:CreateWindow(cfg)
     cfg = cfg or {}
     local W = cfg.Width or 640
@@ -407,7 +254,6 @@ function Phat:CreateWindow(cfg)
     corner(Main, 14)
     stroke(Main, C.BOR, 1.5)
 
-    -- TopBar
     local TopBar = Instance.new("Frame")
     TopBar.Name = "TopBar"
     TopBar.Size = UDim2.new(1, 0, 0, 44)
@@ -442,7 +288,6 @@ function Phat:CreateWindow(cfg)
         TextXAlignment = Enum.TextXAlignment.Left,
     })
 
-    -- Window Buttons
     local function makeBtn(xOff, txt, nc, hc, tc)
         local btn = Instance.new("TextButton")
         btn.Size = UDim2.fromOffset(26, 26)
@@ -471,7 +316,6 @@ function Phat:CreateWindow(cfg)
     local BtnMax = makeBtn(-42, "□", C.ELEM, C.ELEMH, C.T3)
     local BtnClose = makeBtn(-12, "X", Color3.fromRGB(45, 12, 12), C.RED, C.RED)
 
-    -- TopBar Drag
     local drag = {active = false, startPos = nil, startMainPos = nil}
     TopBar.InputBegan:Connect(function(i)
         if i.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -497,7 +341,6 @@ function Phat:CreateWindow(cfg)
         end
     end)
 
-    -- Edge Drag
     local EDGE_SIZE = 10
     local function createEdgeHitbox(name, pos, size)
         local hitbox = Instance.new("Frame")
@@ -509,9 +352,6 @@ function Phat:CreateWindow(cfg)
         hitbox.BorderSizePixel = 0
         hitbox.ZIndex = 100
         hitbox.Parent = Main
-
-        local dragging = false
-        local startPos, startMainPos
 
         hitbox.InputBegan:Connect(function(i)
             if i.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -525,14 +365,8 @@ function Phat:CreateWindow(cfg)
         end)
         hitbox.InputEnded:Connect(function(i)
             if i.UserInputType == Enum.UserInputType.MouseButton1 then
-                dragging = false
             end
         end)
-
-        return {hitbox = hitbox, dragging = function() return dragging end, 
-                setDragging = function(v) dragging = v end,
-                getStart = function() return startPos, startMainPos end,
-                setStart = function(s, m) startPos = s; startMainPos = m end}
     end
 
     createEdgeHitbox("Top", UDim2.new(0, 0, 0, 0), UDim2.new(1, 0, 0, EDGE_SIZE))
@@ -579,7 +413,7 @@ function Phat:CreateWindow(cfg)
             resizing = nil
         end
     end)
-    -- Sidebar
+
     local Sidebar = Instance.new("Frame")
     Sidebar.Name = "Sidebar"
     Sidebar.Size = UDim2.new(0, SW, 1, -44)
@@ -613,7 +447,6 @@ function Phat:CreateWindow(cfg)
     vlist(tabContainer, 4)
     pad(tabContainer, 2, 6, 6, 6)
 
-    -- Content
     local Content = Instance.new("ScrollingFrame")
     Content.Name = "Content"
     Content.Size = UDim2.new(1, -SW, 1, -44)
@@ -628,7 +461,6 @@ function Phat:CreateWindow(cfg)
     vlist(Content, 10)
     pad(Content, 12, 12, 12, 12)
 
-    -- Floating Toggle Button
     local CoreGui = game:GetService("CoreGui")
     local ToggleGui = Instance.new("ScreenGui")
     ToggleGui.Name = "PhatToggle"
@@ -730,7 +562,6 @@ function Phat:CreateWindow(cfg)
         end
     end)
 
-    -- Window Methods
     function Window:Toggle()
         self._visible = not self._visible
         Main.Visible = self._visible
@@ -764,7 +595,6 @@ function Phat:CreateWindow(cfg)
         return self._visible
     end
 
-    -- AddTab
     local tabIdx = 0
 
     function Window:AddTab(cfg)
@@ -866,7 +696,6 @@ function Phat:CreateWindow(cfg)
         if tabIdx == 1 then task.defer(activate) end
         table.insert(Window._tabs, Tab)
 
-        -- AddSection
         local secIdx = 0
         function Tab:AddSection(title)
             secIdx = secIdx + 1
@@ -929,7 +758,6 @@ function Phat:CreateWindow(cfg)
 
             local ei = 0
 
-            -- AddButton
             function Sec:AddButton(bc)
                 bc = bc or {}
                 ei = ei + 1
@@ -997,7 +825,7 @@ function Phat:CreateWindow(cfg)
                     tw(arr, {TextColor3 = C.T3}, 0.12)
                 end)
             end
-            -- Add Toggle
+
             function Sec:AddToggle(name, tc)
                 if type(name) == "table" then
                     tc = name
@@ -1083,7 +911,6 @@ function Phat:CreateWindow(cfg)
                 return ctrl
             end
 
-            -- AddSlider
             function Sec:AddSlider(sc)
                 sc = sc or {}
                 ei = ei + 1
@@ -1185,7 +1012,6 @@ function Phat:CreateWindow(cfg)
                 }
             end
 
-            -- AddInput
             function Sec:AddInput(ic)
                 ic = ic or {}
                 ei = ei + 1
@@ -1205,46 +1031,46 @@ function Phat:CreateWindow(cfg)
                     TextXAlignment = Enum.TextXAlignment.Left,
                 })
 
-                    local bg = Instance.new("Frame")
-                    bg.Size = UDim2.new(1, 0, 0, 32)
-                    bg.Position = UDim2.new(0, 0, 0, 18)
-                    bg.BackgroundColor3 = C.ELEM
-                    bg.BorderSizePixel = 0
-                    corner(bg, 7)
-                    local iStr = stroke(bg, C.BOR, 1)
-                    bg.Parent = wrap
+                local bg = Instance.new("Frame")
+                bg.Size = UDim2.new(1, 0, 0, 32)
+                bg.Position = UDim2.new(0, 0, 0, 18)
+                bg.BackgroundColor3 = C.ELEM
+                bg.BorderSizePixel = 0
+                corner(bg, 7)
+                local iStr = stroke(bg, C.BOR, 1)
+                bg.Parent = wrap
 
-                    local tb = Instance.new("TextBox")
-                    tb.Size = UDim2.new(1, -16, 1, 0)
-                    tb.Position = UDim2.new(0, 10, 0, 0)
-                    tb.BackgroundTransparency = 1
-                    tb.Text = ic.Default or ""
-                    tb.PlaceholderText = ic.Placeholder or "Type here..."
-                    tb.TextColor3 = C.T1
-                    tb.PlaceholderColor3 = C.T3
-                    tb.TextSize = 12
-                    tb.Font = Enum.Font.Gotham
-                    tb.TextXAlignment = Enum.TextXAlignment.Left
-                    tb.ClearTextOnFocus = ic.ClearOnFocus ~= false
-                    tb.Parent = bg
+                local tb = Instance.new("TextBox")
+                tb.Size = UDim2.new(1, -16, 1, 0)
+                tb.Position = UDim2.new(0, 10, 0, 0)
+                tb.BackgroundTransparency = 1
+                tb.Text = ic.Default or ""
+                tb.PlaceholderText = ic.Placeholder or "Type here..."
+                tb.TextColor3 = C.T1
+                tb.PlaceholderColor3 = C.T3
+                tb.TextSize = 12
+                tb.Font = Enum.Font.Gotham
+                tb.TextXAlignment = Enum.TextXAlignment.Left
+                tb.ClearTextOnFocus = ic.ClearOnFocus ~= false
+                tb.Parent = bg
 
-                    tb.Focused:Connect(function()
-                        iStr.Color = C.RED
-                    end)
-                    tb.FocusLost:Connect(function(enter)
-                        iStr.Color = C.BOR
-                        if ic.Callback then pcall(ic.Callback, tb.Text, enter) end
-                    end)
+                tb.Focused:Connect(function()
+                    iStr.Color = C.RED
+                end)
+                tb.FocusLost:Connect(function(enter)
+                    iStr.Color = C.BOR
+                    if ic.Callback then pcall(ic.Callback, tb.Text, enter) end
+                end)
 
-                    local ctrl = {Get = function() return tb.Text end}
-                    registerOption(ic.Name, ctrl, "Input",
-                        function(v) tb.Text = v end,
-                        function() return tb.Text end
-                    )
+                local ctrl = {Get = function() return tb.Text end}
+                registerOption(ic.Name, ctrl, "Input",
+                    function(v) tb.Text = v end,
+                    function() return tb.Text end
+                )
 
-                    return ctrl
-                end
-            --- AddParagraph
+                return ctrl
+            end
+
             function Sec:AddParagraph(pc)
                 pc = pc or {}
                 ei = ei + 1
@@ -1292,7 +1118,6 @@ function Phat:CreateWindow(cfg)
                     DatNoiDung = function(text)
                         noiDung.Text = text or ""
                     end,
-
                     LayNoiDung = function()
                         return noiDung.Text
                     end,
@@ -1305,6 +1130,7 @@ function Phat:CreateWindow(cfg)
 
                 return ctrl
             end
+
             function Sec:AddTitle(text)
                 ei = ei + 1
 
@@ -1316,8 +1142,9 @@ function Phat:CreateWindow(cfg)
 
                 local titleLbl = mkLabel(titleFrame, {
                     Text = text or "Tiêu đề",
-                    Size = UDim2.new(1, 0, 1, 0),
-                    Position = UDim2.new(0, 0, 0, 0),
+                    Size = UDim2.new(1, -12, 1, 0),
+                    AnchorPoint = Vector2.new(0.5, 0),
+                    Position = UDim2.new(0.5, 0, 0, 0),
                     TextColor3 = C.T1,
                     TextSize = 14,
                     Font = Enum.Font.GothamBold,
@@ -1333,7 +1160,7 @@ function Phat:CreateWindow(cfg)
                     end
                 }
             end
-            -- AddDropdown
+
             function Sec:AddDropdown(dc)
                 dc = dc or {}
                 ei = ei + 1
@@ -1473,13 +1300,13 @@ function Phat:CreateWindow(cfg)
 
                 return ctrl
             end
+
             return Sec
         end
 
         return Tab
     end
 
-    -- Window Controls
     local minimized = false
     local maximized = false
     local origSize = Main.Size
@@ -1523,7 +1350,6 @@ function Phat:CreateWindow(cfg)
         end)
     end)
 
-    -- Entry animation
     Main.BackgroundTransparency = 1
     Main.Size = UDim2.new(0, W * 0.85, 0, H * 0.85)
     tw(Main, {Size = UDim2.new(0, W, 0, H), BackgroundTransparency = 0}, 0.28, Enum.EasingStyle.Quint)
