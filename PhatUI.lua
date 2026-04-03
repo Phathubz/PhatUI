@@ -1245,6 +1245,66 @@ function Phat:CreateWindow(cfg)
                     return ctrl
                 end
                 --- AddParagraph
+                function Sec:AddParagraph(pc)
+                    pc = pc or {}
+                    ei = ei + 1
+
+                    local row = Instance.new("Frame")
+                    row.Size = UDim2.new(1, 0, 0, 30)
+                    row.BackgroundColor3 = C.ELEM
+                    row.BorderSizePixel = 0
+                    row.LayoutOrder = ei
+                    corner(row, 7)
+                    stroke(row, C.BOR, 1)
+                    row.Parent = inner
+
+                    local tieuDe = mkLabel(row, {
+                        Text = pc.Title or "Tiêu đề",
+                        Size = UDim2.new(0.45, -12, 1, 0),
+                        Position = UDim2.new(0, 12, 0, 0),
+                        TextColor3 = C.T2,
+                        TextSize = 12,
+                        Font = Enum.Font.Gotham,
+                        TextXAlignment = Enum.TextXAlignment.Left,
+                        TextTruncate = Enum.TextTruncate.AtEnd,
+                    })
+
+                    local noiDung = mkLabel(row, {
+                        Text = pc.Content or "",
+                        Size = UDim2.new(0.55, -16, 1, 0),
+                        Position = UDim2.new(0.45, 4, 0, 0),
+                        TextColor3 = C.RED2,
+                        TextSize = 12,
+                        Font = Enum.Font.GothamBold,
+                        TextXAlignment = Enum.TextXAlignment.Right,
+                        TextTruncate = Enum.TextTruncate.AtEnd,
+                    })
+
+                    row.MouseEnter:Connect(function()
+                        tw(row, {BackgroundColor3 = C.ELEMH}, 0.08)
+                    end)
+
+                    row.MouseLeave:Connect(function()
+                        tw(row, {BackgroundColor3 = C.ELEM}, 0.1)
+                    end)
+
+                    local ctrl = {
+                        DatNoiDung = function(text)
+                            noiDung.Text = text or ""
+                        end,
+
+                        LayNoiDung = function()
+                            return noiDung.Text
+                        end,
+                    }
+
+                    registerOption(pc.Name, ctrl, "Paragraph",
+                        function(v) noiDung.Text = v end,
+                        function() return noiDung.Text end
+                    )
+
+                    return ctrl
+                end
                 function Sec:AddTitle(text)
                     ei = ei + 1
 
