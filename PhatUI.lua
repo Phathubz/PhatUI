@@ -1205,46 +1205,75 @@ function Phat:CreateWindow(cfg)
                     TextXAlignment = Enum.TextXAlignment.Left,
                 })
 
-                local bg = Instance.new("Frame")
-                bg.Size = UDim2.new(1, 0, 0, 32)
-                bg.Position = UDim2.new(0, 0, 0, 18)
-                bg.BackgroundColor3 = C.ELEM
-                bg.BorderSizePixel = 0
-                corner(bg, 7)
-                local iStr = stroke(bg, C.BOR, 1)
-                bg.Parent = wrap
+                    local bg = Instance.new("Frame")
+                    bg.Size = UDim2.new(1, 0, 0, 32)
+                    bg.Position = UDim2.new(0, 0, 0, 18)
+                    bg.BackgroundColor3 = C.ELEM
+                    bg.BorderSizePixel = 0
+                    corner(bg, 7)
+                    local iStr = stroke(bg, C.BOR, 1)
+                    bg.Parent = wrap
 
-                local tb = Instance.new("TextBox")
-                tb.Size = UDim2.new(1, -16, 1, 0)
-                tb.Position = UDim2.new(0, 10, 0, 0)
-                tb.BackgroundTransparency = 1
-                tb.Text = ic.Default or ""
-                tb.PlaceholderText = ic.Placeholder or "Type here..."
-                tb.TextColor3 = C.T1
-                tb.PlaceholderColor3 = C.T3
-                tb.TextSize = 12
-                tb.Font = Enum.Font.Gotham
-                tb.TextXAlignment = Enum.TextXAlignment.Left
-                tb.ClearTextOnFocus = ic.ClearOnFocus ~= false
-                tb.Parent = bg
+                    local tb = Instance.new("TextBox")
+                    tb.Size = UDim2.new(1, -16, 1, 0)
+                    tb.Position = UDim2.new(0, 10, 0, 0)
+                    tb.BackgroundTransparency = 1
+                    tb.Text = ic.Default or ""
+                    tb.PlaceholderText = ic.Placeholder or "Type here..."
+                    tb.TextColor3 = C.T1
+                    tb.PlaceholderColor3 = C.T3
+                    tb.TextSize = 12
+                    tb.Font = Enum.Font.Gotham
+                    tb.TextXAlignment = Enum.TextXAlignment.Left
+                    tb.ClearTextOnFocus = ic.ClearOnFocus ~= false
+                    tb.Parent = bg
 
-                tb.Focused:Connect(function()
-                    iStr.Color = C.RED
-                end)
-                tb.FocusLost:Connect(function(enter)
-                    iStr.Color = C.BOR
-                    if ic.Callback then pcall(ic.Callback, tb.Text, enter) end
-                end)
+                    tb.Focused:Connect(function()
+                        iStr.Color = C.RED
+                    end)
+                    tb.FocusLost:Connect(function(enter)
+                        iStr.Color = C.BOR
+                        if ic.Callback then pcall(ic.Callback, tb.Text, enter) end
+                    end)
 
-                local ctrl = {Get = function() return tb.Text end}
-                registerOption(ic.Name, ctrl, "Input",
-                    function(v) tb.Text = v end,
-                    function() return tb.Text end
-                )
+                    local ctrl = {Get = function() return tb.Text end}
+                    registerOption(ic.Name, ctrl, "Input",
+                        function(v) tb.Text = v end,
+                        function() return tb.Text end
+                    )
 
-                return ctrl
-            end
+                    return ctrl
+                end
+                --- AddParagraph
+                function Sec:AddTitle(text)
+                    ei = ei + 1
 
+                    local titleFrame = Instance.new("Frame")
+                    titleFrame.Size = UDim2.new(1, 0, 0, 26)
+                    titleFrame.BackgroundTransparency = 1
+                    titleFrame.LayoutOrder = ei
+                    titleFrame.Parent = inner
+
+                    local titleLbl = mkLabel(titleFrame, {
+                        Text = text or "Tiêu đề",
+                        Size = UDim2.new(1, -12, 1, 0),
+                        AnchorPoint = Vector2.new(0.5, 0),
+                        Position = UDim2.new(0.5, 0, 0, 0),
+                        TextColor3 = C.T1,
+                        TextSize = 14,
+                        Font = Enum.Font.GothamBold,
+                        TextXAlignment = Enum.TextXAlignment.Center,
+                    })
+
+                    return {
+                        DatTieuDe = function(t)
+                            titleLbl.Text = t or ""
+                        end,
+                        LayTieuDe = function()
+                            return titleLbl.Text
+                        end
+                    }
+                end
             -- AddDropdown
             function Sec:AddDropdown(dc)
                 dc = dc or {}
