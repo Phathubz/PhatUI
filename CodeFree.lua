@@ -7,6 +7,73 @@
 local Phat = {}
 Phat.__index = Phat
 
+Phat.Options = {}
+
+local function registerOption(id, optType, default)
+    Phat.Options[id] = {type = optType, value = default}
+end
+
+local LucideIcons = {
+    Sword = "⚔", Shield = "🛡", Star = "★", Heart = "♥", Crown = "♔",
+    Skull = "💀", Target = "◎", Zap = "⚡", Check = "✓", Cross = "✕",
+    Info = "ℹ", Warning = "⚠", Plus = "+", Minus = "−", Search = "🔍",
+    Settings = "⚙", User = "👤", Lock = "🔒", Unlock = "🔓", Eye = "👁",
+    EyeOff = "🙈", Refresh = "↻", Play = "▶", Pause = "⏸", Stop = "⏹",
+    ArrowRight = "→", ArrowLeft = "←", ArrowUp = "↑", ArrowDown = "↓",
+    ChevronRight = "›", ChevronLeft = "‹", ChevronUp = "⌃", ChevronDown = "⌄",
+    Circle = "●", CircleOutline = "○", Square = "■", SquareOutline = "□",
+    Diamond = "◆", Flame = "🔥", Snowflake = "❄", Sun = "☀", Moon = "☾",
+    Cloud = "☁", Bolt = "⚡", Bomb = "💣", Gem = "💎", Gift = "🎁",
+    Music = "♪", Bell = "🔔", Mail = "✉", Flag = "⚑", Key = "🔑",
+    Trophy = "🏆", Medal = "🏅", Coin = "🪙", Dollar = "$", Euro = "€",
+    Pound = "£", Yen = "¥", Timer = "⏱", Clock = "🕐", Calendar = "📅",
+    Home = "🏠", World = "🌍", Map = "🗺", Compass = "🧭", Anchor = "⚓",
+    Rocket = "🚀", Plane = "✈", Car = "🚗", Bike = "🚲", Tree = "🌲",
+    Leaf = "🍃", Flower = "🌸", Paw = "🐾", Fish = "🐟", Bug = "🐛",
+    Cat = "🐱", Dog = "🐕", Bird = "🐦", Snake = "🐍", Dragon = "🐉",
+    Ghost = "👻", Robot = "🤖", Fire = "🔥", Ice = "🧊", Lightning = "⚡",
+    Earth = "🌍", Water = "💧", Wind = "💨", Mountain = "⛰", Beach = "🏖",
+    Desert = "🏜", Jungle = "🌴", Cave = "🕳", Castle = "🏰", Gear = "⚙",
+    Hammer = "🔨", Wrench = "🔧", Link = "🔗", Mic = "🎤", Camera = "📷",
+    Tv = "📺", Phone = "📱", Computer = "💻", Folder = "📁", File = "📄",
+    Book = "📖", Books = "📚", Newspaper = "📰", Clipboard = "📋", Pen = "🖊",
+    Smile = "😊", Laugh = "😂", Cry = "😭", Angry = "😡", Thinking = "🤔",
+    Cool = "😎", Ninja = "🥷", SmileCat = "😺", HeartEyes = "😍",
+    Rocket2 = "🚀", Satellite = "🛰", Signal = "📡", Wifi = "📶",
+    Bluetooth = "📶", Usb = "🔌", Battery = "🔋", Plug = "🔌",
+    Lightbulb = "💡", Flashlight = "🔦", Candle = "🕯", Lamp = "💡",
+    Truck = "🚚", Ship = "🚢", Train = "🚂", Bus = "🚌", Taxi = "🚕",
+    Ambulance = "🚑", FireTruck = "🚒", Police = "🚓", Atom = "⚛",
+    Telescope = "🔭", Microscope = "🔬", Orbit = "🪐", Molecule = "🔬",
+    Apple = "🍎", Pear = "🍐", Orange = "🍊", Banana = "🍌", Melon = "🍈",
+    Strawberry = "🍓", Grape = "🍇", Cherry = "🍒", Pizza = "🍕",
+    Burger = "🍔", Fries = "🍟", Taco = "🌮", Salad = "🥗", Soup = "🍲",
+    Coffee = "☕", Tea = "🍵", Beer = "🍺", Wine = "🍷", Soda = "🥤",
+    Bomb2 = "💣", Dna = "🧬", Virus = "🦠", Stethoscope = "🩺",
+    Pill = "💊", Syringe = "💉", TestTube = "🧪", Bed = "🛏", Door = "🚪",
+    Window = "🪟", Toilet = "🚽", Bath = "🛁", Shower = "🚿", Sink = "🚰",
+    ShoppingCart = "🛒", Box = "📦", Package = "📦", Money = "💰",
+    CreditCard = "💳", Wallet = "👛", Crown2 = "👑", Medal2 = "🏅",
+    Trophy2 = "🏆", Party = "🎉", Confetti = "🎊", Balloon = "🎈",
+    Bread = "🍞", Rice = "🍚", Egg = "🥚", Meat = "🍖", Chicken = "🍗",
+    Fish2 = "🐟", Shrimp = "🦐", Crab = "🦀", Lobster = "🦞", Octopus = "🐙",
+    Tulip = "🌷", Rose = "🌹", Sunflower = "🌻", Cactus = "🌵",
+    Eagle = "🦅", Owl = "🦉", Bat = "🦇", Whale = "🐋", Dolphin = "🐬",
+    Penguin = "🐧", Shark = "🦈", Shell = "🐚", Turtle = "🐢", Egg2 = "🥚",
+    Dino = "🦕", Dino2 = "🦖", Worm = "🐛", Bee = "🐝", Beetle = "🪲",
+    Butterfly = "🦋", Ladybug = "🐞", Spider = "🕷", Web = "🕸",
+    Rabbit = "🐰", Fox = "🦊", Bear = "🐻", Panda = "🐼", Koala = "🐨",
+    Tiger = "🐯", Lion = "🦁", Horse = "🐴", Zebra = "🦓", Deer = "🦌",
+    Camel = "🐪", Goat = "🐐", Sheep = "🐑", Cow = "🐄", Pig = "🐖",
+    Elephant = "🐘", Giraffe = "🦒", Monkey = "🐵", Squirrel = "🐿",
+    Turkey = "🐔", Hatching = "🐣", Chick = "🐤", Egg3 = "🥚",
+}
+
+local function getIcon(iconName)
+    if not iconName then return "" end
+    return LucideIcons[iconName] or tostring(iconName)
+end
+
 local TweenService = game:GetService("TweenService")
 local UIS = game:GetService("UserInputService")
 local Players = game:GetService("Players")
@@ -579,7 +646,6 @@ function Phat:CreateWindow(cfg)
         if tabIdx == 1 then task.defer(activate) end
         table.insert(Window._tabs, Tab)
 
-        -- ============ AddButton ============
         function Tab:AddButton(bc)
             bc = bc or {}
             local elementId = #self._elements + 1
@@ -636,7 +702,6 @@ function Phat:CreateWindow(cfg)
             return btnFrame
         end
 
-        -- ============ AddToggle ============
         function Tab:AddToggle(tc)
             tc = tc or {}
             local state = tc.Default or false
@@ -651,9 +716,26 @@ function Phat:CreateWindow(cfg)
             corner(row, 12)
             stroke(row, C.BOR, 1, 0.5)
             row.Parent = Page
-            pad(row, 10, 12, 10, 12)
 
-            mkLabel(row, {
+            local innerWrap = Instance.new("Frame")
+            innerWrap.Size = UDim2.new(1, 0, 0, 0)
+            innerWrap.AutomaticSize = Enum.AutomaticSize.Y
+            innerWrap.BackgroundTransparency = 1
+            innerWrap.Parent = row
+            vlist(innerWrap, 8)
+            pad(innerWrap, 10, 12, 10, 12)
+
+            local headerRow = Instance.new("Frame")
+            headerRow.Size = UDim2.new(1, 0, 0, 24)
+            headerRow.BackgroundTransparency = 1
+            headerRow.Parent = innerWrap
+
+            local contentWrap = Instance.new("Frame")
+            contentWrap.Size = UDim2.new(1, -52, 1, 0)
+            contentWrap.BackgroundTransparency = 1
+            contentWrap.Parent = headerRow
+
+            mkLabel(contentWrap, {
                 Text = tc.Title or "Toggle",
                 TextColor3 = C.T1,
                 TextSize = 13,
@@ -663,13 +745,19 @@ function Phat:CreateWindow(cfg)
                 AutomaticSize = Enum.AutomaticSize.Y,
             })
 
+            local trackWrap = Instance.new("Frame")
+            trackWrap.Size = UDim2.fromOffset(44, 24)
+            trackWrap.Position = UDim2.new(1, -44, 0.5, -12)
+            trackWrap.BackgroundTransparency = 1
+            trackWrap.Parent = headerRow
+
             local track = Instance.new("Frame")
-            track.Size = UDim2.fromOffset(44, 24)
+            track.Size = UDim2.new(1, 0, 1, 0)
             track.BackgroundColor3 = C.DIV
             track.BorderSizePixel = 0
             corner(track, 12)
             stroke(track, state and C.RED or C.BOR, 2, state and 0 or 0.5)
-            track.Parent = row
+            track.Parent = trackWrap
 
             local knob = Instance.new("Frame")
             knob.Size = UDim2.fromOffset(18, 18)
@@ -678,22 +766,6 @@ function Phat:CreateWindow(cfg)
             knob.BorderSizePixel = 0
             corner(knob, 9)
             knob.Parent = track
-
-            local layout = hlist(row, 8)
-            layout.VerticalAlignment = Enum.VerticalAlignment.Center
-
-            local contentWrap = Instance.new("Frame")
-            contentWrap.Size = UDim2.new(1, -52, 1, 0)
-            contentWrap.AutomaticSize = Enum.AutomaticSize.Y
-            contentWrap.BackgroundTransparency = 1
-            contentWrap.Parent = row
-            contentWrap.LayoutOrder = 1
-
-            local trackWrap = Instance.new("Frame")
-            trackWrap.Size = UDim2.new(0, 44, 0, 24)
-            trackWrap.BackgroundTransparency = 1
-            trackWrap.Parent = row
-            trackWrap.LayoutOrder = 2
 
             local function set(v)
                 state = v
@@ -728,7 +800,6 @@ function Phat:CreateWindow(cfg)
             }
         end
 
-        -- ============ AddSlider ============
         function Tab:AddSlider(sc)
             sc = sc or {}
             local mn, mx = sc.Min or 0, sc.Max or 100
@@ -753,25 +824,6 @@ function Phat:CreateWindow(cfg)
             vlist(innerWrap, 8)
             pad(innerWrap, 12, 12, 12, 12)
 
-            mkLabel(innerWrap, {
-                Text = sc.Title or "Slider",
-                TextColor3 = C.T1,
-                TextSize = 13,
-                Font = Enum.Font.GothamBold,
-                TextXAlignment = Enum.TextXAlignment.Left,
-                AutomaticSize = Enum.AutomaticSize.Y,
-            })
-
-            local vLbl = mkLabel(innerWrap, {
-                Text = tostring(math.round(val)),
-                Size = UDim2.fromOffset(50, 20),
-                TextColor3 = C.RED2,
-                TextSize = 14,
-                Font = Enum.Font.GothamBold,
-                TextXAlignment = Enum.TextXAlignment.Right,
-                AutomaticSize = Enum.AutomaticSize.Y,
-            })
-
             local headerRow = Instance.new("Frame")
             headerRow.Size = UDim2.new(1, 0, 0, 20)
             headerRow.BackgroundTransparency = 1
@@ -786,7 +838,7 @@ function Phat:CreateWindow(cfg)
                 TextXAlignment = Enum.TextXAlignment.Left,
             })
 
-            mkLabel(headerRow, {
+            local vLbl = mkLabel(headerRow, {
                 Text = tostring(math.round(val)),
                 Size = UDim2.fromOffset(50, 20),
                 Position = UDim2.new(1, -54, 0, 0),
@@ -870,7 +922,6 @@ function Phat:CreateWindow(cfg)
             }
         end
 
-        -- ============ AddInput ============
         function Tab:AddInput(cfg)
             cfg = cfg or {}
             local elementId = #self._elements + 1
@@ -936,7 +987,6 @@ function Phat:CreateWindow(cfg)
             }
         end
 
-        -- ============ AddDropdown ============
         function Tab:AddDropdown(dc)
             dc = dc or {}
             local sel, open = dc.Default, false
@@ -1077,7 +1127,6 @@ function Phat:CreateWindow(cfg)
             }
         end
 
-        -- ============ AddSection ============
         function Tab:AddSection(title)
             local Sec = {}
             local secId = #self._elements + 1
@@ -1187,12 +1236,29 @@ function Phat:CreateWindow(cfg)
                 row.BackgroundColor3 = C.SEC
                 row.BorderSizePixel = 0
                 row.LayoutOrder = ei
-                corner(row, 10)
+                corner(row, 12)
                 stroke(row, C.BOR, 1, 0.5)
                 row.Parent = inner
-                pad(row, 10, 12, 10, 12)
 
-                mkLabel(row, {
+                local innerWrap = Instance.new("Frame")
+                innerWrap.Size = UDim2.new(1, 0, 0, 0)
+                innerWrap.AutomaticSize = Enum.AutomaticSize.Y
+                innerWrap.BackgroundTransparency = 1
+                innerWrap.Parent = row
+                vlist(innerWrap, 8)
+                pad(innerWrap, 10, 12, 10, 12)
+
+                local headerRow = Instance.new("Frame")
+                headerRow.Size = UDim2.new(1, 0, 0, 24)
+                headerRow.BackgroundTransparency = 1
+                headerRow.Parent = innerWrap
+
+                local contentWrap = Instance.new("Frame")
+                contentWrap.Size = UDim2.new(1, -52, 1, 0)
+                contentWrap.BackgroundTransparency = 1
+                contentWrap.Parent = headerRow
+
+                mkLabel(contentWrap, {
                     Text = tc.Title or "Toggle",
                     TextColor3 = C.T1,
                     TextSize = 13,
@@ -1202,13 +1268,19 @@ function Phat:CreateWindow(cfg)
                     AutomaticSize = Enum.AutomaticSize.Y,
                 })
 
+                local trackWrap = Instance.new("Frame")
+                trackWrap.Size = UDim2.fromOffset(44, 24)
+                trackWrap.Position = UDim2.new(1, -44, 0.5, -12)
+                trackWrap.BackgroundTransparency = 1
+                trackWrap.Parent = headerRow
+
                 local track = Instance.new("Frame")
-                track.Size = UDim2.fromOffset(44, 24)
+                track.Size = UDim2.new(1, 0, 1, 0)
                 track.BackgroundColor3 = C.DIV
                 track.BorderSizePixel = 0
                 corner(track, 12)
                 stroke(track, state and C.RED or C.BOR, 2, state and 0 or 0.5)
-                track.Parent = row
+                track.Parent = trackWrap
 
                 local knob = Instance.new("Frame")
                 knob.Size = UDim2.fromOffset(18, 18)
@@ -1538,6 +1610,100 @@ function Phat:CreateWindow(cfg)
                         if connection then connection:Disconnect() end
                     end
                 }
+            end
+            function Sec:AddParagraph(pc)
+                pc = pc or {}
+                ei = ei + 1
+
+                local row = Instance.new("Frame")
+                row.Size = UDim2.new(1, 0, 0, 0)
+                row.AutomaticSize = Enum.AutomaticSize.Y
+                row.BackgroundColor3 = C.ELEM
+                row.BorderSizePixel = 0
+                row.LayoutOrder = ei
+                corner(row, 10)
+                stroke(row, C.BOR, 1, 0.5)
+                row.Parent = inner
+
+                local innerRow = Instance.new("Frame")
+                innerRow.Size = UDim2.new(1, 0, 0, 0)
+                innerRow.AutomaticSize = Enum.AutomaticSize.Y
+                innerRow.BackgroundTransparency = 1
+                innerRow.Parent = row
+                vlist(innerRow, 6)
+                pad(innerRow, 10, 12, 10, 12)
+
+                local titleRow = Instance.new("Frame")
+                titleRow.Size = UDim2.new(1, 0, 0, 0)
+                titleRow.AutomaticSize = Enum.AutomaticSize.Y
+                titleRow.BackgroundTransparency = 1
+                titleRow.Parent = innerRow
+
+                local contentWrap = Instance.new("Frame")
+                contentWrap.Size = UDim2.new(1, 0, 0, 0)
+                contentWrap.AutomaticSize = Enum.AutomaticSize.Y
+                contentWrap.BackgroundTransparency = 1
+                contentWrap.Parent = titleRow
+                hlist(contentWrap, 8)
+
+                if pc.Icon and pc.Icon ~= "" then
+                    local iconLbl = mkLabel(contentWrap, {
+                        Text = getIcon(pc.Icon),
+                        Size = UDim2.fromOffset(20, 20),
+                        TextColor3 = C.RED2,
+                        TextSize = 14,
+                        Font = Enum.Font.GothamBold,
+                    })
+                end
+
+                local titleLbl = mkLabel(contentWrap, {
+                    Text = pc.Title or "Title",
+                    Size = UDim2.new(0, 0, 0, 0),
+                    AutomaticSize = Enum.AutomaticSize.X,
+                    TextColor3 = C.T2,
+                    TextSize = 12,
+                    Font = Enum.Font.GothamBold,
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                })
+
+                local descLbl = mkLabel(innerRow, {
+                    Text = pc.Content or "",
+                    Size = UDim2.new(1, 0, 0, 0),
+                    AutomaticSize = Enum.AutomaticSize.Y,
+                    TextColor3 = C.T1,
+                    TextSize = 11,
+                    Font = Enum.Font.Gotham,
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    TextWrapped = true,
+                })
+
+                row.MouseEnter:Connect(function()
+                    tw(row, {BackgroundColor3 = C.ELEMH}, 0.08)
+                end)
+                row.MouseLeave:Connect(function()
+                    tw(row, {BackgroundColor3 = C.ELEM}, 0.1)
+                end)
+
+                local ctrl = {
+                    SetDesc = function(text)
+                        descLbl.Text = text or ""
+                    end,
+                    GetDesc = function()
+                        return descLbl.Text
+                    end,
+                    SetTitle = function(text)
+                        titleLbl.Text = text or ""
+                    end,
+                    GetTitle = function()
+                        return titleLbl.Text
+                    end,
+                }
+
+                if pc.Name then
+                    registerOption(pc.Name, ctrl, "Paragraph")
+                end
+
+                return ctrl
             end
 
             table.insert(self._elements, secFrame)
