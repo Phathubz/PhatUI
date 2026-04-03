@@ -1096,16 +1096,17 @@ function Phat:CreateWindow(cfg)
                 })
 
                 local noiDung = mkLabel(row, {
-                    Text = pc.Content or "",
-                    Size = UDim2.new(0.62, 0, 1, 0), 
-                    Position = UDim2.new(0.38, 4, 0, 0),
+                    Text = pc.Content or "GAY",
+                    Size = UDim2.new(0, 0, 1, 0),
+                    AutomaticSize = Enum.AutomaticSize.X,
+                    Position = UDim2.new(1, -8, 0, 0),
+                    AnchorPoint = Vector2.new(1, 0),
                     TextColor3 = C.RED2,
-                    TextSize = 11, -- thêm dòng này
+                    TextSize = 11,
                     Font = Enum.Font.GothamBold,
                     TextXAlignment = Enum.TextXAlignment.Right,
-                    TextTruncate = Enum.TextTruncate.AtEnd,
+                    TextTruncate = Enum.TextTruncate.None,
                 })
-
                 row.MouseEnter:Connect(function()
                     tw(row, {BackgroundColor3 = C.ELEMH}, 0.08)
                 end)
