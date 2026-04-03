@@ -1086,7 +1086,7 @@ function Phat:CreateWindow(cfg)
 
                 local tieuDe = mkLabel(row, {
                     Text = pc.Title or "Tiêu đề",
-                    Size = UDim2.new(0.45, -12, 1, 0),
+                    Size = UDim2.new(0.38, -12, 1, 0),
                     Position = UDim2.new(0, 12, 0, 0),
                     TextColor3 = C.T2,
                     TextSize = 12,
@@ -1097,7 +1097,7 @@ function Phat:CreateWindow(cfg)
 
                 local noiDung = mkLabel(row, {
                     Text = pc.Content or "",
-                    Size = UDim2.new(0.55, -16, 1, 0),
+                    Size = UDim2.new(0.62, -16, 1, 0),
                     Position = UDim2.new(0.45, 4, 0, 0),
                     TextColor3 = C.RED2,
                     TextSize = 12,
@@ -1145,7 +1145,7 @@ function Phat:CreateWindow(cfg)
                     Size = UDim2.new(1, -12, 1, 0),
                     AnchorPoint = Vector2.new(0.5, 0),
                     Position = UDim2.new(0.5, 0, 0, 0),
-                    TextColor3 = C.T1,
+                    TextColor3 = Color3.fromRGB(255, 120, 120),
                     TextSize = 14,
                     Font = Enum.Font.GothamBold,
                     TextXAlignment = Enum.TextXAlignment.Center,
