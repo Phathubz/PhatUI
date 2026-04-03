@@ -1316,9 +1316,8 @@ function Phat:CreateWindow(cfg)
 
                 local titleLbl = mkLabel(titleFrame, {
                     Text = text or "Tiêu đề",
-                    Size = UDim2.new(1, -12, 1, 0),
-                    AnchorPoint = Vector2.new(0.5, 0),
-                    Position = UDim2.new(0.5, 0, 0, 0),
+                    Size = UDim2.new(1, 0, 1, 0),
+                    Position = UDim2.new(0, 0, 0, 0),
                     TextColor3 = C.T1,
                     TextSize = 14,
                     Font = Enum.Font.GothamBold,
