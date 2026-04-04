@@ -56,10 +56,11 @@ local function corner(p, r)
     c.CornerRadius = UDim.new(0, r or 8)
 end
 
-local function stroke(p, col, th)
+local function stroke(p, col, th, tr)
     local s = Instance.new("UIStroke", p)
     s.Color = col or C.BOR
     s.Thickness = th or 1
+    s.Transparency = tr or 0
     return s
 end
 
@@ -439,10 +440,15 @@ function Phat:CreateWindow(cfg)
         TextXAlignment = Enum.TextXAlignment.Left,
     })
 
-    local tabContainer = Instance.new("Frame")
+    local tabContainer = Instance.new("ScrollingFrame")
     tabContainer.Size = UDim2.new(1, 0, 1, -28)
     tabContainer.Position = UDim2.new(0, 0, 0, 26)
     tabContainer.BackgroundTransparency = 1
+    tabContainer.BorderSizePixel = 0
+    tabContainer.ScrollBarThickness = 2          -- thanh scroll mỏng
+    tabContainer.ScrollBarImageColor3 = C.RED    -- màu theo theme
+    tabContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
+    tabContainer.AutomaticCanvasSize = Enum.AutomaticSize.Y  -- tự giãn theo số tab
     tabContainer.Parent = Sidebar
     vlist(tabContainer, 4)
     pad(tabContainer, 2, 6, 6, 6)
@@ -1097,34 +1103,51 @@ function Phat:CreateWindow(cfg)
 
                 local noiDung = mkLabel(row, {
                     Text = pc.Content or "",
-                    Size = UDim2.new(0, 200, 1, 0),
-                    Position = UDim2.new(0, tieuDe.TextBounds.X + 16, 0, 0),
+                    Size = UDim2.new(0.6, -12, 1, 0),
+                    Position = UDim2.new(0.38, 0, 0, 0),  -- Fix: dùng Scale thay vì TextBounds (chưa render kịp)
                     TextColor3 = C.RED2,
                     TextSize = 11,
                     Font = Enum.Font.GothamBold,
                     TextXAlignment = Enum.TextXAlignment.Left,
-                    TextTruncate = Enum.TextTruncate.None,
+                    TextTruncate = Enum.TextTruncate.AtEnd,
                 })
+
                 row.MouseEnter:Connect(function()
                     tw(row, {BackgroundColor3 = C.ELEMH}, 0.08)
                 end)
-
                 row.MouseLeave:Connect(function()
                     tw(row, {BackgroundColor3 = C.ELEM}, 0.1)
                 end)
 
-                local ctrl = {
-                    DatNoiDung = function(text)
-                        noiDung.Text = text or ""
-                        noiDung.Position = UDim2.new(0, tieuDe.TextBounds.X + 16, 0, 0)
-                    end,
-                    LayNoiDung = function()
-                        return noiDung.Text
-                    end,
-                }
+                local ctrl = {}
+
+                -- Fix: dùng function ctrl:Method() thay vì function(text)
+                -- để gọi được cả : lẫn . đều không lỗi
+                function ctrl:DatNoiDung(text)
+                    noiDung.Text = tostring(text or "")
+                end
+
+                function ctrl:LayNoiDung()
+                    return noiDung.Text
+                end
+
+                -- Backward compat: gọi bằng . cũng được
+                ctrl.DatNoiDung = function(self_or_text, text)
+                    if type(self_or_text) == "string" then
+                        -- Gọi bằng dấu . : ctrl.DatNoiDung("abc")
+                        noiDung.Text = tostring(self_or_text or "")
+                    else
+                        -- Gọi bằng dấu : : ctrl:DatNoiDung("abc")
+                        noiDung.Text = tostring(text or "")
+                    end
+                end
+
+                ctrl.LayNoiDung = function()
+                    return noiDung.Text
+                end
 
                 registerOption(pc.Name, ctrl, "Paragraph",
-                    function(v) noiDung.Text = v end,
+                    function(v) noiDung.Text = tostring(v or "") end,
                     function() return noiDung.Text end
                 )
 
@@ -1206,15 +1229,16 @@ function Phat:CreateWindow(cfg)
                 })
 
                 local panel = Instance.new("Frame")
-                panel.Size = UDim2.new(1, 0, 0, 0)
-                panel.Position = UDim2.new(0, 0, 1, 4)
+                panel.Size = UDim2.new(0, 0, 0, 0) 
                 panel.BackgroundColor3 = C.SEC
                 panel.BorderSizePixel = 0
                 panel.ClipsDescendants = true
                 panel.ZIndex = 60
                 corner(panel, 7)
                 stroke(panel, C.RED, 1)
-                panel.Parent = ddw
+                panel.Parent = Main 
+                vlist(panel, 2)
+                pad(panel, 4, 4, 4, 4)
                 vlist(panel, 2)
                 pad(panel, 4, 4, 4, 4)
 
@@ -1252,7 +1276,20 @@ function Phat:CreateWindow(cfg)
                 local pH = #items * 30 + 8
                 dBtn.MouseButton1Click:Connect(function()
                     open = not open
-                    tw(panel, {Size = open and UDim2.new(1, 0, 0, pH) or UDim2.new(1, 0, 0, 0)}, 0.16, Enum.EasingStyle.Quart)
+
+                    -- Tính vị trí tuyệt đối của ddw
+                    local abs = dBtn.AbsolutePosition
+                    local absSize = dBtn.AbsoluteSize
+                    local panelW = absSize.X
+
+                    panel.Size = UDim2.new(0, panelW, 0, 0)
+                    panel.Position = UDim2.new(0, abs.X, 0, abs.Y + absSize.Y + 4)
+
+                    tw(panel, {
+                        Size = open 
+                            and UDim2.new(0, panelW, 0, pH) 
+                            or  UDim2.new(0, panelW, 0, 0)
+                    }, 0.16, Enum.EasingStyle.Quart)
                     tw(dArr, {Rotation = open and 180 or 0}, 0.16)
                 end)
                 local connection
