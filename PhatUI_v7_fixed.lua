@@ -475,15 +475,14 @@ function Phat:CreateWindow(cfg)
     ToggleGui.ResetOnSpawn = false
     ToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-    local ToggleBtn = Instance.new("TextButton")
+    local ToggleBtn = Instance.new("ImageButton")
     ToggleBtn.Name = "ToggleButton"
     ToggleBtn.Size = UDim2.new(0, 52, 0, 52)
     ToggleBtn.Position = UDim2.new(0, 18, 0.5, -26)
     ToggleBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-    ToggleBtn.Text = "P"
-    ToggleBtn.TextScaled = true
-    ToggleBtn.Font = Enum.Font.GothamBlack
-    ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ToggleBtn.Image = "rbxassetid://113810810167058"
+    ToggleBtn.ImageColor3 = Color3.fromRGB(255, 255, 255)
+    ToggleBtn.ScaleType = Enum.ScaleType.Fit
     ToggleBtn.AutoButtonColor = false
     corner(ToggleBtn, 10)
     ToggleBtn.Parent = ToggleGui
