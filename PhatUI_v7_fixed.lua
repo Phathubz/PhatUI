@@ -408,6 +408,7 @@ function Phat:CreateWindow(cfg)
         end
 
         Main.Size = newSize
+        Main.Position = newPos
     end)
 
     UIS.InputEnded:Connect(function(input)
@@ -479,7 +480,7 @@ function Phat:CreateWindow(cfg)
     ToggleBtn.Name = "ToggleButton"
     ToggleBtn.Size = UDim2.new(0, 52, 0, 52)
     ToggleBtn.Position = UDim2.new(0, 18, 0.5, -26)
-    ToggleBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    ToggleBtn.BackgroundTransparency = 1
     ToggleBtn.Image = "rbxassetid://113810810167058"
     ToggleBtn.ImageColor3 = Color3.fromRGB(255, 255, 255)
     ToggleBtn.ScaleType = Enum.ScaleType.Fit
@@ -492,6 +493,7 @@ function Phat:CreateWindow(cfg)
         ColorSequenceKeypoint.new(0, Color3.fromRGB(90, 90, 90)),
         ColorSequenceKeypoint.new(1, Color3.fromRGB(35, 35, 35))
     })
+    BtnGrad.Enabled = false
     BtnGrad.Parent = ToggleBtn
 
     local BtnStroke = Instance.new("UIStroke")
