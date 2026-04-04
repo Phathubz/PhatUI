@@ -480,7 +480,7 @@ function Phat:CreateWindow(cfg)
     ToggleBtn.Size = UDim2.new(0, 52, 0, 52)
     ToggleBtn.Position = UDim2.new(0, 18, 0.5, -26)
     ToggleBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-    ToggleBtn.Image = "rbxassetid://113810810167058"
+    ToggleBtn.Image = "rbxassetid://129035427059734"
     ToggleBtn.ImageColor3 = Color3.fromRGB(255, 255, 255)
     ToggleBtn.ScaleType = Enum.ScaleType.Fit
     ToggleBtn.AutoButtonColor = false
