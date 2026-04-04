@@ -1229,12 +1229,17 @@ function Phat:CreateWindow(cfg)
                     ZIndex = 21,
                 })
 
-                -- Panel render lên Main để thoát khỏi ClipsDescendants
-                local panel = Instance.new("Frame")
+                -- Panel là ScrollingFrame để có thể scroll nếu quá nhiều item
+                local MAX_PANEL_H = 180  -- chiều cao tối đa trước khi scroll
+                local panel = Instance.new("ScrollingFrame")
                 panel.Size = UDim2.new(0, 0, 0, 0)
                 panel.BackgroundColor3 = C.SEC
                 panel.BorderSizePixel = 0
                 panel.ClipsDescendants = true
+                panel.ScrollBarThickness = 2
+                panel.ScrollBarImageColor3 = C.RED
+                panel.CanvasSize = UDim2.new(0, 0, 0, 0)
+                panel.AutomaticCanvasSize = Enum.AutomaticSize.Y
                 panel.ZIndex = 200
                 panel.Visible = false
                 corner(panel, 7)
@@ -1244,7 +1249,8 @@ function Phat:CreateWindow(cfg)
                 pad(panel, 4, 4, 4, 4)
 
                 local items = dc.Items or {}
-                local pH = #items * 30 + 8
+                local rawH = #items * 30 + 8
+                local pH = math.min(rawH, MAX_PANEL_H)  -- giới hạn chiều cao
 
                 for _, item in ipairs(items) do
                     local opt = Instance.new("TextButton")
@@ -1274,13 +1280,48 @@ function Phat:CreateWindow(cfg)
                         tw(dArr, {Rotation = 0}, 0.14)
                         if dc.Callback then pcall(dc.Callback, sel) end
                     end)
+
+                    -- Scroll wheel trên opt pass xuống Content
+                    opt.InputChanged:Connect(function(i)
+                        if i.UserInputType == Enum.UserInputType.MouseWheel then
+                            panel.CanvasPosition = Vector2.new(
+                                0,
+                                panel.CanvasPosition.Y - (i.Position.Z * 30)
+                            )
+                        end
+                    end)
                 end
+
+                -- Scroll wheel trên panel pass xuống Content khi chuột ở vùng trống
+                panel.InputChanged:Connect(function(i)
+                    if i.UserInputType == Enum.UserInputType.MouseWheel then
+                        panel.CanvasPosition = Vector2.new(
+                            0,
+                            panel.CanvasPosition.Y - (i.Position.Z * 30)
+                        )
+                    end
+                end)
 
                 local function updatePanelPosition()
                     local abs = dBtn.AbsolutePosition
                     local absSize = dBtn.AbsoluteSize
+                    local screenH = sg.AbsoluteSize.Y
+
+                    -- Tính xem có đủ chỗ bên dưới không, nếu không thì hiện lên trên
+                    local spaceBelow = screenH - (abs.Y + absSize.Y + 4)
+                    local spaceAbove = abs.Y - 4
+
+                    local posY
+                    if spaceBelow >= pH or spaceBelow >= spaceAbove then
+                        -- Hiện bên dưới
+                        posY = abs.Y + absSize.Y + 4
+                    else
+                        -- Hiện bên trên
+                        posY = abs.Y - pH - 4
+                    end
+
                     panel.Size = UDim2.new(0, absSize.X, 0, pH)
-                    panel.Position = UDim2.new(0, abs.X, 0, abs.Y + absSize.Y + 4)
+                    panel.Position = UDim2.new(0, abs.X, 0, posY)
                 end
 
                 local function closePanel()
@@ -1288,13 +1329,13 @@ function Phat:CreateWindow(cfg)
                     panel.Visible = false
                     tw(dArr, {Rotation = 0}, 0.14)
                 end
+
                 Content:GetPropertyChangedSignal("CanvasPosition"):Connect(function()
                     if open then
                         updatePanelPosition()
                     end
                 end)
 
-                -- Connect nút mở/đóng (riêng biệt)
                 dBtn.MouseButton1Click:Connect(function()
                     open = not open
                     if open then
@@ -1305,21 +1346,19 @@ function Phat:CreateWindow(cfg)
                         closePanel()
                     end
                 end)
-                -- Đóng khi click ra ngoài
+
                 local connection
                 connection = UIS.InputBegan:Connect(function(i)
                     if i.UserInputType == Enum.UserInputType.MouseButton1 then
                         if open then
                             local mousePos = i.Position
 
-                            -- Kiểm tra có trong panel không
                             local pPos = panel.AbsolutePosition
                             local pSize = panel.AbsoluteSize
                             local inPanel =
                                 mousePos.X >= pPos.X and mousePos.X <= pPos.X + pSize.X and
                                 mousePos.Y >= pPos.Y and mousePos.Y <= pPos.Y + pSize.Y
 
-                            -- Kiểm tra có trong nút không
                             local bPos = dBtn.AbsolutePosition
                             local bSize = dBtn.AbsoluteSize
                             local inBtn =
@@ -1342,6 +1381,7 @@ function Phat:CreateWindow(cfg)
                     end,
                     Destroy = function()
                         if connection then connection:Disconnect() end
+                        closePanel()
                         panel:Destroy()
                     end
                 }
