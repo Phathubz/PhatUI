@@ -1382,6 +1382,9 @@ function Phat:CreateWindow(cfg)
                 return ctrl
             end
 
+            return Sec
+        end
+
         return Tab
     end
 
