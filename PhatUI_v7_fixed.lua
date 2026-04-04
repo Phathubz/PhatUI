@@ -1228,21 +1228,23 @@ function Phat:CreateWindow(cfg)
                     ZIndex = 21,
                 })
 
+                -- Panel render lên Main để thoát khỏi ClipsDescendants
                 local panel = Instance.new("Frame")
-                panel.Size = UDim2.new(0, 0, 0, 0) 
+                panel.Size = UDim2.new(0, 0, 0, 0)
                 panel.BackgroundColor3 = C.SEC
                 panel.BorderSizePixel = 0
                 panel.ClipsDescendants = true
-                panel.ZIndex = 60
+                panel.ZIndex = 200
+                panel.Visible = false
                 corner(panel, 7)
                 stroke(panel, C.RED, 1)
-                panel.Parent = Main 
-                vlist(panel, 2)
-                pad(panel, 4, 4, 4, 4)
+                panel.Parent = Main   -- render thẳng lên Main
                 vlist(panel, 2)
                 pad(panel, 4, 4, 4, 4)
 
                 local items = dc.Items or {}
+                local pH = #items * 30 + 8
+
                 for _, item in ipairs(items) do
                     local opt = Instance.new("TextButton")
                     opt.Size = UDim2.new(1, 0, 0, 26)
@@ -1252,7 +1254,7 @@ function Phat:CreateWindow(cfg)
                     opt.TextSize = 11
                     opt.Font = Enum.Font.Gotham
                     opt.BorderSizePixel = 0
-                    opt.ZIndex = 61
+                    opt.ZIndex = 201
                     corner(opt, 5)
                     opt.Parent = panel
 
@@ -1267,53 +1269,64 @@ function Phat:CreateWindow(cfg)
                         dLbl.Text = item
                         dLbl.TextColor3 = C.T1
                         open = false
-                        tw(panel, {Size = UDim2.new(1, 0, 0, 0)}, 0.14)
+                        panel.Visible = false
                         tw(dArr, {Rotation = 0}, 0.14)
                         if dc.Callback then pcall(dc.Callback, sel) end
                     end)
                 end
 
-                local pH = #items * 30 + 8
-                dBtn.MouseButton1Click:Connect(function()
-                    open = not open
-
-                    -- Tính vị trí tuyệt đối của ddw
+                local function updatePanelPosition()
                     local abs = dBtn.AbsolutePosition
                     local absSize = dBtn.AbsoluteSize
-                    local panelW = absSize.X
-
-                    panel.Size = UDim2.new(0, panelW, 0, 0)
+                    panel.Size = UDim2.new(0, absSize.X, 0, pH)
                     panel.Position = UDim2.new(0, abs.X, 0, abs.Y + absSize.Y + 4)
+                end
 
-                    tw(panel, {
-                        Size = open 
-                            and UDim2.new(0, panelW, 0, pH) 
-                            or  UDim2.new(0, panelW, 0, 0)
-                    }, 0.16, Enum.EasingStyle.Quart)
-                    tw(dArr, {Rotation = open and 180 or 0}, 0.16)
+                local function closePanel()
+                    open = false
+                    panel.Visible = false
+                    tw(dArr, {Rotation = 0}, 0.14)
+                end
+
+                dBtn.MouseButton1Click:Connect(function()
+                    open = not open
+                    if open then
+                        updatePanelPosition()
+                        panel.Visible = true
+                        tw(dArr, {Rotation = 180}, 0.16)
+                    else
+                        closePanel()
+                    end
                 end)
+
+                -- Đóng khi click ra ngoài
                 local connection
                 connection = UIS.InputBegan:Connect(function(i)
                     if i.UserInputType == Enum.UserInputType.MouseButton1 then
                         if open then
                             local mousePos = i.Position
-                            local absPos = ddw.AbsolutePosition
-                            local absSize = ddw.AbsoluteSize
 
-                            local inside =
-                                mousePos.X >= absPos.X and
-                                mousePos.X <= absPos.X + absSize.X and
-                                mousePos.Y >= absPos.Y and
-                                mousePos.Y <= absPos.Y + absSize.Y
+                            -- Kiểm tra có trong panel không
+                            local pPos = panel.AbsolutePosition
+                            local pSize = panel.AbsoluteSize
+                            local inPanel =
+                                mousePos.X >= pPos.X and mousePos.X <= pPos.X + pSize.X and
+                                mousePos.Y >= pPos.Y and mousePos.Y <= pPos.Y + pSize.Y
 
-                            if not inside then
-                                open = false
-                                tw(panel, {Size = UDim2.new(1, 0, 0, 0)}, 0.14)
-                                tw(dArr, {Rotation = 0}, 0.14)
+                            -- Kiểm tra có trong nút không
+                            local bPos = dBtn.AbsolutePosition
+                            local bSize = dBtn.AbsoluteSize
+                            local inBtn =
+                                mousePos.X >= bPos.X and mousePos.X <= bPos.X + bSize.X and
+                                mousePos.Y >= bPos.Y and mousePos.Y <= bPos.Y + bSize.Y
+
+                            if not inPanel and not inBtn then
+                                closePanel()
                             end
                         end
                     end
                 end)
+
                 local ctrl = {
                     Get = function() return sel end,
                     Set = function(v)
@@ -1323,6 +1336,7 @@ function Phat:CreateWindow(cfg)
                     end,
                     Destroy = function()
                         if connection then connection:Disconnect() end
+                        panel:Destroy()
                     end
                 }
 
