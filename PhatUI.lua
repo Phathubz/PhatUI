@@ -56,10 +56,11 @@ local function corner(p, r)
     c.CornerRadius = UDim.new(0, r or 8)
 end
 
-local function stroke(p, col, th)
+local function stroke(p, col, th, tr)
     local s = Instance.new("UIStroke", p)
     s.Color = col or C.BOR
     s.Thickness = th or 1
+    s.Transparency = tr or 0
     return s
 end
 
@@ -231,6 +232,7 @@ function Phat:CreateWindow(cfg)
     sg.Parent = PlayerGui
     sg.ResetOnSpawn = false
     sg.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    Window._sg = sg
 
     NotificationHolder = Instance.new("Frame")
     NotificationHolder.Name = "NotificationHolder"
@@ -439,10 +441,15 @@ function Phat:CreateWindow(cfg)
         TextXAlignment = Enum.TextXAlignment.Left,
     })
 
-    local tabContainer = Instance.new("Frame")
+    local tabContainer = Instance.new("ScrollingFrame")
     tabContainer.Size = UDim2.new(1, 0, 1, -28)
     tabContainer.Position = UDim2.new(0, 0, 0, 26)
     tabContainer.BackgroundTransparency = 1
+    tabContainer.BorderSizePixel = 0
+    tabContainer.ScrollBarThickness = 2          -- thanh scroll mỏng
+    tabContainer.ScrollBarImageColor3 = C.RED    -- màu theo theme
+    tabContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
+    tabContainer.AutomaticCanvasSize = Enum.AutomaticSize.Y  -- tự giãn theo số tab
     tabContainer.Parent = Sidebar
     vlist(tabContainer, 4)
     pad(tabContainer, 2, 6, 6, 6)
@@ -468,15 +475,14 @@ function Phat:CreateWindow(cfg)
     ToggleGui.ResetOnSpawn = false
     ToggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-    local ToggleBtn = Instance.new("TextButton")
+    local ToggleBtn = Instance.new("ImageButton")
     ToggleBtn.Name = "ToggleButton"
     ToggleBtn.Size = UDim2.new(0, 52, 0, 52)
     ToggleBtn.Position = UDim2.new(0, 18, 0.5, -26)
     ToggleBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-    ToggleBtn.Text = "P"
-    ToggleBtn.TextScaled = true
-    ToggleBtn.Font = Enum.Font.GothamBlack
-    ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ToggleBtn.Image = "rbxassetid://113810810167058"
+    ToggleBtn.ImageColor3 = Color3.fromRGB(255, 255, 255)
+    ToggleBtn.ScaleType = Enum.ScaleType.Fit
     ToggleBtn.AutoButtonColor = false
     corner(ToggleBtn, 10)
     ToggleBtn.Parent = ToggleGui
@@ -1086,7 +1092,7 @@ function Phat:CreateWindow(cfg)
 
                 local tieuDe = mkLabel(row, {
                     Text = pc.Title or "Tiêu đề",
-                    Size = UDim2.new(0.45, -12, 1, 0),
+                    Size = UDim2.new(0.38, -12, 1, 0),
                     Position = UDim2.new(0, 12, 0, 0),
                     TextColor3 = C.T2,
                     TextSize = 12,
@@ -1097,34 +1103,51 @@ function Phat:CreateWindow(cfg)
 
                 local noiDung = mkLabel(row, {
                     Text = pc.Content or "",
-                    Size = UDim2.new(0.55, -16, 1, 0),
-                    Position = UDim2.new(0.45, 4, 0, 0),
+                    Size = UDim2.new(0.6, -12, 1, 0),
+                    Position = UDim2.new(0.38, 0, 0, 0),  -- Fix: dùng Scale thay vì TextBounds (chưa render kịp)
                     TextColor3 = C.RED2,
-                    TextSize = 12,
+                    TextSize = 11,
                     Font = Enum.Font.GothamBold,
-                    TextXAlignment = Enum.TextXAlignment.Right,
+                    TextXAlignment = Enum.TextXAlignment.Left,
                     TextTruncate = Enum.TextTruncate.AtEnd,
                 })
 
                 row.MouseEnter:Connect(function()
                     tw(row, {BackgroundColor3 = C.ELEMH}, 0.08)
                 end)
-
                 row.MouseLeave:Connect(function()
                     tw(row, {BackgroundColor3 = C.ELEM}, 0.1)
                 end)
 
-                local ctrl = {
-                    DatNoiDung = function(text)
-                        noiDung.Text = text or ""
-                    end,
-                    LayNoiDung = function()
-                        return noiDung.Text
-                    end,
-                }
+                local ctrl = {}
+
+                -- Fix: dùng function ctrl:Method() thay vì function(text)
+                -- để gọi được cả : lẫn . đều không lỗi
+                function ctrl:DatNoiDung(text)
+                    noiDung.Text = tostring(text or "")
+                end
+
+                function ctrl:LayNoiDung()
+                    return noiDung.Text
+                end
+
+                -- Backward compat: gọi bằng . cũng được
+                ctrl.DatNoiDung = function(self_or_text, text)
+                    if type(self_or_text) == "string" then
+                        -- Gọi bằng dấu . : ctrl.DatNoiDung("abc")
+                        noiDung.Text = tostring(self_or_text or "")
+                    else
+                        -- Gọi bằng dấu : : ctrl:DatNoiDung("abc")
+                        noiDung.Text = tostring(text or "")
+                    end
+                end
+
+                ctrl.LayNoiDung = function()
+                    return noiDung.Text
+                end
 
                 registerOption(pc.Name, ctrl, "Paragraph",
-                    function(v) noiDung.Text = v end,
+                    function(v) noiDung.Text = tostring(v or "") end,
                     function() return noiDung.Text end
                 )
 
@@ -1145,7 +1168,7 @@ function Phat:CreateWindow(cfg)
                     Size = UDim2.new(1, -12, 1, 0),
                     AnchorPoint = Vector2.new(0.5, 0),
                     Position = UDim2.new(0.5, 0, 0, 0),
-                    TextColor3 = C.T1,
+                    TextColor3 = Color3.fromRGB(255, 120, 120),
                     TextSize = 14,
                     Font = Enum.Font.GothamBold,
                     TextXAlignment = Enum.TextXAlignment.Center,
@@ -1205,20 +1228,29 @@ function Phat:CreateWindow(cfg)
                     ZIndex = 21,
                 })
 
-                local panel = Instance.new("Frame")
-                panel.Size = UDim2.new(1, 0, 0, 0)
-                panel.Position = UDim2.new(0, 0, 1, 4)
+                -- Panel là ScrollingFrame để có thể scroll nếu quá nhiều item
+                local MAX_PANEL_H = 180  -- chiều cao tối đa trước khi scroll
+                local panel = Instance.new("ScrollingFrame")
+                panel.Size = UDim2.new(0, 0, 0, 0)
                 panel.BackgroundColor3 = C.SEC
                 panel.BorderSizePixel = 0
                 panel.ClipsDescendants = true
-                panel.ZIndex = 60
+                panel.ScrollBarThickness = 2
+                panel.ScrollBarImageColor3 = C.RED
+                panel.CanvasSize = UDim2.new(0, 0, 0, 0)
+                panel.AutomaticCanvasSize = Enum.AutomaticSize.Y
+                panel.ZIndex = 200
+                panel.Visible = false
                 corner(panel, 7)
                 stroke(panel, C.RED, 1)
-                panel.Parent = ddw
+                panel.Parent = sg
                 vlist(panel, 2)
                 pad(panel, 4, 4, 4, 4)
 
                 local items = dc.Items or {}
+                local rawH = #items * 30 + 8
+                local pH = math.min(rawH, MAX_PANEL_H)  -- giới hạn chiều cao
+
                 for _, item in ipairs(items) do
                     local opt = Instance.new("TextButton")
                     opt.Size = UDim2.new(1, 0, 0, 26)
@@ -1228,7 +1260,7 @@ function Phat:CreateWindow(cfg)
                     opt.TextSize = 11
                     opt.Font = Enum.Font.Gotham
                     opt.BorderSizePixel = 0
-                    opt.ZIndex = 61
+                    opt.ZIndex = 201
                     corner(opt, 5)
                     opt.Parent = panel
 
@@ -1243,40 +1275,102 @@ function Phat:CreateWindow(cfg)
                         dLbl.Text = item
                         dLbl.TextColor3 = C.T1
                         open = false
-                        tw(panel, {Size = UDim2.new(1, 0, 0, 0)}, 0.14)
+                        panel.Visible = false
                         tw(dArr, {Rotation = 0}, 0.14)
                         if dc.Callback then pcall(dc.Callback, sel) end
                     end)
+
+                    -- Scroll wheel trên opt pass xuống Content
+                    opt.InputChanged:Connect(function(i)
+                        if i.UserInputType == Enum.UserInputType.MouseWheel then
+                            panel.CanvasPosition = Vector2.new(
+                                0,
+                                panel.CanvasPosition.Y - (i.Position.Z * 30)
+                            )
+                        end
+                    end)
                 end
 
-                local pH = #items * 30 + 8
+                -- Scroll wheel trên panel pass xuống Content khi chuột ở vùng trống
+                panel.InputChanged:Connect(function(i)
+                    if i.UserInputType == Enum.UserInputType.MouseWheel then
+                        panel.CanvasPosition = Vector2.new(
+                            0,
+                            panel.CanvasPosition.Y - (i.Position.Z * 30)
+                        )
+                    end
+                end)
+
+                local function updatePanelPosition()
+                    local abs = dBtn.AbsolutePosition
+                    local absSize = dBtn.AbsoluteSize
+                    local screenH = sg.AbsoluteSize.Y
+
+                    -- Tính xem có đủ chỗ bên dưới không, nếu không thì hiện lên trên
+                    local spaceBelow = screenH - (abs.Y + absSize.Y + 4)
+                    local spaceAbove = abs.Y - 4
+
+                    local posY
+                    if spaceBelow >= pH or spaceBelow >= spaceAbove then
+                        -- Hiện bên dưới
+                        posY = abs.Y + absSize.Y + 4
+                    else
+                        -- Hiện bên trên
+                        posY = abs.Y - pH - 4
+                    end
+
+                    panel.Size = UDim2.new(0, absSize.X, 0, pH)
+                    panel.Position = UDim2.new(0, abs.X, 0, posY)
+                end
+
+                local function closePanel()
+                    open = false
+                    panel.Visible = false
+                    tw(dArr, {Rotation = 0}, 0.14)
+                end
+
+                Content:GetPropertyChangedSignal("CanvasPosition"):Connect(function()
+                    if open then
+                        updatePanelPosition()
+                    end
+                end)
+
                 dBtn.MouseButton1Click:Connect(function()
                     open = not open
-                    tw(panel, {Size = open and UDim2.new(1, 0, 0, pH) or UDim2.new(1, 0, 0, 0)}, 0.16, Enum.EasingStyle.Quart)
-                    tw(dArr, {Rotation = open and 180 or 0}, 0.16)
+                    if open then
+                        updatePanelPosition()
+                        panel.Visible = true
+                        tw(dArr, {Rotation = 180}, 0.16)
+                    else
+                        closePanel()
+                    end
                 end)
+
                 local connection
                 connection = UIS.InputBegan:Connect(function(i)
                     if i.UserInputType == Enum.UserInputType.MouseButton1 then
                         if open then
                             local mousePos = i.Position
-                            local absPos = ddw.AbsolutePosition
-                            local absSize = ddw.AbsoluteSize
 
-                            local inside =
-                                mousePos.X >= absPos.X and
-                                mousePos.X <= absPos.X + absSize.X and
-                                mousePos.Y >= absPos.Y and
-                                mousePos.Y <= absPos.Y + absSize.Y
+                            local pPos = panel.AbsolutePosition
+                            local pSize = panel.AbsoluteSize
+                            local inPanel =
+                                mousePos.X >= pPos.X and mousePos.X <= pPos.X + pSize.X and
+                                mousePos.Y >= pPos.Y and mousePos.Y <= pPos.Y + pSize.Y
 
-                            if not inside then
-                                open = false
-                                tw(panel, {Size = UDim2.new(1, 0, 0, 0)}, 0.14)
-                                tw(dArr, {Rotation = 0}, 0.14)
+                            local bPos = dBtn.AbsolutePosition
+                            local bSize = dBtn.AbsoluteSize
+                            local inBtn =
+                                mousePos.X >= bPos.X and mousePos.X <= bPos.X + bSize.X and
+                                mousePos.Y >= bPos.Y and mousePos.Y <= bPos.Y + bSize.Y
+
+                            if not inPanel and not inBtn then
+                                closePanel()
                             end
                         end
                     end
                 end)
+
                 local ctrl = {
                     Get = function() return sel end,
                     Set = function(v)
@@ -1286,6 +1380,8 @@ function Phat:CreateWindow(cfg)
                     end,
                     Destroy = function()
                         if connection then connection:Disconnect() end
+                        closePanel()
+                        panel:Destroy()
                     end
                 }
 
