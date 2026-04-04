@@ -478,14 +478,13 @@ function Phat:CreateWindow(cfg)
 
     local ToggleBtn = Instance.new("ImageButton")
     ToggleBtn.Name = "ToggleButton"
-    ToggleBtn.Size = UDim2.new(0, 52, 0, 52)
-    ToggleBtn.Position = UDim2.new(0, 18, 0.5, -26)
+    ToggleBtn.Size = UDim2.new(0, 72, 0, 72)  -- ← tăng size lên
+    ToggleBtn.Position = UDim2.new(0, 18, 0.5, -36)
     ToggleBtn.BackgroundTransparency = 1
     ToggleBtn.Image = "rbxassetid://113810810167058"
     ToggleBtn.ImageColor3 = Color3.fromRGB(255, 255, 255)
     ToggleBtn.ScaleType = Enum.ScaleType.Fit
     ToggleBtn.AutoButtonColor = false
-    corner(ToggleBtn, 10)
     ToggleBtn.Parent = ToggleGui
 
     local BtnGrad = Instance.new("UIGradient")
@@ -549,7 +548,7 @@ function Phat:CreateWindow(cfg)
     end)
 
     ToggleBtn.MouseEnter:Connect(function()
-        tw(ToggleBtn, {Size = UDim2.new(0, 60, 0, 60)}, 0.12, Enum.EasingStyle.Quad)
+        tw(ToggleBtn, {Size = UDim2.new(0, 84, 0, 84)}, 0.12, Enum.EasingStyle.Quad)
         BtnGrad.Color = ColorSequence.new({
             ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 85, 0)),
             ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 20, 0))
@@ -559,14 +558,14 @@ function Phat:CreateWindow(cfg)
 
     ToggleBtn.MouseLeave:Connect(function()
         if Window._visible then
-            tw(ToggleBtn, {Size = UDim2.new(0, 52, 0, 52)}, 0.12, Enum.EasingStyle.Quad)
+            tw(ToggleBtn, {Size = UDim2.new(0, 72, 0, 72)}, 0.12, Enum.EasingStyle.Quad)
             BtnGrad.Color = ColorSequence.new({
                 ColorSequenceKeypoint.new(0, Color3.fromRGB(90, 90, 90)),
                 ColorSequenceKeypoint.new(1, Color3.fromRGB(35, 35, 35))
             })
             BtnStroke.Color = Color3.fromRGB(130, 130, 130)
         else
-            tw(ToggleBtn, {Size = UDim2.new(0, 52, 0, 52)}, 0.12, Enum.EasingStyle.Quad)
+            tw(ToggleBtn, {Size = UDim2.new(0, 72, 0, 72)}, 0.12, Enum.EasingStyle.Quad)
         end
     end)
 
