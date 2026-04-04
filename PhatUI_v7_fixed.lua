@@ -1229,31 +1229,22 @@ function Phat:CreateWindow(cfg)
                     ZIndex = 21,
                 })
 
-                -- ✅ SCROLLING PANEL
-                local panel = Instance.new("ScrollingFrame")
+                local panel = Instance.new("Frame")
                 panel.Size = UDim2.new(0, 0, 0, 0)
                 panel.BackgroundColor3 = C.SEC
                 panel.BorderSizePixel = 0
                 panel.ClipsDescendants = true
                 panel.ZIndex = 200
                 panel.Visible = false
-                panel.ScrollBarThickness = 4
-                panel.CanvasSize = UDim2.new(0, 0, 0, 0)
-                panel.ScrollingDirection = Enum.ScrollingDirection.Y
-                panel.Parent = sg
-
                 corner(panel, 7)
                 stroke(panel, C.RED, 1)
+                panel.Parent = sg
                 vlist(panel, 2)
                 pad(panel, 4, 4, 4, 4)
 
                 local items = dc.Items or {}
+                local pH = #items * 30 + 8
 
-                local maxHeight = 150
-                local contentHeight = #items * 30 + 8
-                local pH = math.min(contentHeight, maxHeight)
-
-                -- ✅ CREATE ITEMS
                 for _, item in ipairs(items) do
                     local opt = Instance.new("TextButton")
                     opt.Size = UDim2.new(1, 0, 0, 26)
@@ -1273,7 +1264,6 @@ function Phat:CreateWindow(cfg)
                     opt.MouseLeave:Connect(function()
                         tw(opt, {BackgroundColor3 = C.ELEM}, 0.1)
                     end)
-
                     opt.MouseButton1Click:Connect(function()
                         sel = item
                         dLbl.Text = item
@@ -1285,31 +1275,20 @@ function Phat:CreateWindow(cfg)
                     end)
                 end
 
-                -- ✅ AUTO CANVAS SIZE
-                local layout = panel:FindFirstChildOfClass("UIListLayout")
-                if layout then
-                    layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-                        panel.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 8)
-                    end)
-                end
-
                 local RunService = game:GetService("RunService")
                 local panelUpdateConn
 
                 local function updatePanelPosition()
                     local abs = dBtn.AbsolutePosition
                     local absSize = dBtn.AbsoluteSize
-
                     panel.Size = UDim2.new(0, absSize.X, 0, pH)
                     panel.Position = UDim2.new(0, abs.X, 0, abs.Y + absSize.Y + 4)
-                    panel.CanvasSize = UDim2.new(0, 0, 0, contentHeight)
                 end
 
                 local function closePanel()
                     open = false
                     panel.Visible = false
                     tw(dArr, {Rotation = 0}, 0.14)
-
                     if panelUpdateConn then
                         panelUpdateConn:Disconnect()
                         panelUpdateConn = nil
@@ -1322,7 +1301,6 @@ function Phat:CreateWindow(cfg)
                         updatePanelPosition()
                         panel.Visible = true
                         tw(dArr, {Rotation = 180}, 0.16)
-
                         panelUpdateConn = RunService.RenderStepped:Connect(function()
                             updatePanelPosition()
                         end)
