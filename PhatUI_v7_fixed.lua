@@ -232,6 +232,7 @@ function Phat:CreateWindow(cfg)
     sg.Parent = PlayerGui
     sg.ResetOnSpawn = false
     sg.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    Window._sg = sg
 
     NotificationHolder = Instance.new("Frame")
     NotificationHolder.Name = "NotificationHolder"
@@ -1238,7 +1239,7 @@ function Phat:CreateWindow(cfg)
                 panel.Visible = false
                 corner(panel, 7)
                 stroke(panel, C.RED, 1)
-                panel.Parent = Main   -- render thẳng lên Main
+                panel.Parent = sg
                 vlist(panel, 2)
                 pad(panel, 4, 4, 4, 4)
 
@@ -1287,7 +1288,13 @@ function Phat:CreateWindow(cfg)
                     panel.Visible = false
                     tw(dArr, {Rotation = 0}, 0.14)
                 end
+                Content:GetPropertyChangedSignal("CanvasPosition"):Connect(function()
+                    if open then
+                        updatePanelPosition()
+                    end
+                end)
 
+                -- Connect nút mở/đóng (riêng biệt)
                 dBtn.MouseButton1Click:Connect(function()
                     open = not open
                     if open then
@@ -1298,7 +1305,6 @@ function Phat:CreateWindow(cfg)
                         closePanel()
                     end
                 end)
-
                 -- Đóng khi click ra ngoài
                 local connection
                 connection = UIS.InputBegan:Connect(function(i)
