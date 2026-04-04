@@ -1229,6 +1229,7 @@ function Phat:CreateWindow(cfg)
                     ZIndex = 21,
                 })
 
+                -- Panel render lên Main để thoát khỏi ClipsDescendants
                 local panel = Instance.new("Frame")
                 panel.Size = UDim2.new(0, 0, 0, 0)
                 panel.BackgroundColor3 = C.SEC
@@ -1275,9 +1276,6 @@ function Phat:CreateWindow(cfg)
                     end)
                 end
 
-                local RunService = game:GetService("RunService")
-                local panelUpdateConn
-
                 local function updatePanelPosition()
                     local abs = dBtn.AbsolutePosition
                     local absSize = dBtn.AbsoluteSize
@@ -1289,38 +1287,39 @@ function Phat:CreateWindow(cfg)
                     open = false
                     panel.Visible = false
                     tw(dArr, {Rotation = 0}, 0.14)
-                    if panelUpdateConn then
-                        panelUpdateConn:Disconnect()
-                        panelUpdateConn = nil
-                    end
                 end
+                Content:GetPropertyChangedSignal("CanvasPosition"):Connect(function()
+                    if open then
+                        updatePanelPosition()
+                    end
+                end)
 
+                -- Connect nút mở/đóng (riêng biệt)
                 dBtn.MouseButton1Click:Connect(function()
                     open = not open
                     if open then
                         updatePanelPosition()
                         panel.Visible = true
                         tw(dArr, {Rotation = 180}, 0.16)
-                        panelUpdateConn = RunService.RenderStepped:Connect(function()
-                            updatePanelPosition()
-                        end)
                     else
                         closePanel()
                     end
                 end)
-
+                -- Đóng khi click ra ngoài
                 local connection
                 connection = UIS.InputBegan:Connect(function(i)
                     if i.UserInputType == Enum.UserInputType.MouseButton1 then
                         if open then
                             local mousePos = i.Position
 
+                            -- Kiểm tra có trong panel không
                             local pPos = panel.AbsolutePosition
                             local pSize = panel.AbsoluteSize
                             local inPanel =
                                 mousePos.X >= pPos.X and mousePos.X <= pPos.X + pSize.X and
                                 mousePos.Y >= pPos.Y and mousePos.Y <= pPos.Y + pSize.Y
 
+                            -- Kiểm tra có trong nút không
                             local bPos = dBtn.AbsolutePosition
                             local bSize = dBtn.AbsoluteSize
                             local inBtn =
@@ -1343,7 +1342,6 @@ function Phat:CreateWindow(cfg)
                     end,
                     Destroy = function()
                         if connection then connection:Disconnect() end
-                        closePanel()
                         panel:Destroy()
                     end
                 }
