@@ -550,10 +550,10 @@ function Phat:CreateWindow(cfg)
     ToggleBtn.MouseEnter:Connect(function()
         tw(ToggleBtn, {Size = UDim2.new(0, 84, 0, 84)}, 0.12, Enum.EasingStyle.Quad)
         BtnGrad.Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+            ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
             ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 20, 0))
         })
-        BtnStroke.Color = Color3.fromRGB(255, 255, 255)
+        BtnStroke.Color = Color3.fromRGB(255, 0, 0)
     end)
 
     ToggleBtn.MouseLeave:Connect(function()
@@ -561,7 +561,7 @@ function Phat:CreateWindow(cfg)
             tw(ToggleBtn, {Size = UDim2.new(0, 72, 0, 72)}, 0.12, Enum.EasingStyle.Quad)
             BtnGrad.Color = ColorSequence.new({
                 ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 254, 254)),
-                ColorSequenceKeypoint.new(1, Color3.fromRGB(35, 35, 35))
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255))
             })
             BtnStroke.Color = Color3.fromRGB(255, 255, 255)
         else
