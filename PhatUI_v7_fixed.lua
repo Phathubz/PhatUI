@@ -1070,7 +1070,7 @@ function Phat:CreateWindow(cfg)
                 end)
 
                 local ctrl = {Get = function() return tb.Text end}
-                registerOption(ic.Name, ctrl, "Input",
+                registerOption(ic.Name or ic.Title, ctrl, "Input",
                     function(v) tb.Text = v end,
                     function() return tb.Text end
                 )
