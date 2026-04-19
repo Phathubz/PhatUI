@@ -1124,26 +1124,11 @@ function Phat:CreateWindow(cfg)
 
                 -- Fix: dùng function ctrl:Method() thay vì function(text)
                 -- để gọi được cả : lẫn . đều không lỗi
-                function ctrl:DatNoiDung(text)
+                function ctrl.DatNoiDung(text)
                     noiDung.Text = tostring(text or "")
                 end
 
-                function ctrl:LayNoiDung()
-                    return noiDung.Text
-                end
-
-                -- Backward compat: gọi bằng . cũng được
-                ctrl.DatNoiDung = function(self_or_text, text)
-                    if type(self_or_text) == "string" then
-                        -- Gọi bằng dấu . : ctrl.DatNoiDung("abc")
-                        noiDung.Text = tostring(self_or_text or "")
-                    else
-                        -- Gọi bằng dấu : : ctrl:DatNoiDung("abc")
-                        noiDung.Text = tostring(text or "")
-                    end
-                end
-
-                ctrl.LayNoiDung = function()
+                function ctrl.LayNoiDung()
                     return noiDung.Text
                 end
 
