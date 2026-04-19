@@ -289,12 +289,13 @@ function Phat:CreateWindow(cfg)
         Font = Enum.Font.GothamBold,
         TextXAlignment = Enum.TextXAlignment.Left,
     })
-
     local function makeBtn(xOff, txt, nc, hc, tc)
         local btn = Instance.new("TextButton")
         btn.Size = UDim2.fromOffset(26, 26)
-        btn.AnchorPoint = Vector2.new(0.5, 0.5) -- 🔥 quan trọng
-        btn.Position = UDim2.new(0.5, xOff, 0.5, 0)
+
+        btn.AnchorPoint = Vector2.new(0, 0.5) -- 🔥 bám trái
+        btn.Position = UDim2.new(0, xOff, 0.5, 0)
+
         btn.Text = txt
         btn.TextSize = 12
         btn.Font = Enum.Font.GothamBold
@@ -302,23 +303,23 @@ function Phat:CreateWindow(cfg)
         btn.TextColor3 = tc or C.T3
         btn.BorderSizePixel = 0
         btn.AutoButtonColor = false
+
         corner(btn, 6)
         btn.Parent = TopBar
 
         btn.MouseEnter:Connect(function()
             tw(btn, {BackgroundColor3 = hc}, 0.1)
         end)
+
         btn.MouseLeave:Connect(function()
             tw(btn, {BackgroundColor3 = nc}, 0.1)
         end)
 
         return btn
     end
-
-    local BtnMin   = makeBtn(-30, "─", C.ELEM, C.ELEMH, C.T3)
-    local BtnMax   = makeBtn(0,   "□", C.ELEM, C.ELEMH, C.T3)
-    local BtnClose = makeBtn(30,  "X", Color3.fromRGB(45,12,12), C.RED, C.RED)
-
+    local BtnMin   = makeBtn(12, "─", C.ELEM, C.ELEMH, C.T3)
+    local BtnMax   = makeBtn(44, "□", C.ELEM, C.ELEMH, C.T3)
+    local BtnClose = makeBtn(76, "X", Color3.fromRGB(45,12,12), C.RED, C.RED)
     local drag = {active = false, startPos = nil, startMainPos = nil}
     TopBar.InputBegan:Connect(function(i)
         if i.UserInputType == Enum.UserInputType.MouseButton1 then
