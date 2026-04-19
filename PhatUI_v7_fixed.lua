@@ -314,9 +314,9 @@ function Phat:CreateWindow(cfg)
         return btn
     end
 
-    local BtnMin = makeBtn(-72, "─", C.ELEM, C.ELEMH, C.T3)
-    local BtnMax = makeBtn(-42, "□", C.ELEM, C.ELEMH, C.T3)
-    local BtnClose = makeBtn(-12, "X", Color3.fromRGB(45, 12, 12), C.RED, C.RED)
+    local BtnClose = makeBtn(-72, "X", Color3.fromRGB(45, 12, 12), C.RED, C.RED)
+    local BtnMin = makeBtn(-42, "─", C.ELEM, C.ELEMH, C.T3)
+    local BtnMax = makeBtn(-12, "□", C.ELEM, C.ELEMH, C.T3)
 
     local drag = {active = false, startPos = nil, startMainPos = nil}
     TopBar.InputBegan:Connect(function(i)
@@ -1389,38 +1389,27 @@ function Phat:CreateWindow(cfg)
         return Tab
     end
 
-    local minimized = false
-    local maximized = false
+    local uiState = 0
     local origSize = Main.Size
     local origPos = Main.Position
 
     BtnMin.MouseButton1Click:Connect(function()
-        minimized = not minimized
-        if minimized then
+        uiState = (uiState + 1) % 3
+        if uiState == 0 then
+            Content.Visible = true
+            Sidebar.Visible = true
+            tw(Main, {Size = origSize}, 0.2, Enum.EasingStyle.Quart)
+            BtnMin.Text = "─"
+        elseif uiState == 1 then
             Content.Visible = false
             Sidebar.Visible = false
             tw(Main, {Size = UDim2.new(0, W, 0, 44)}, 0.2, Enum.EasingStyle.Quart)
+            BtnMin.Text = "□"
         else
-            local newSize = maximized and UDim2.new(1, -20, 1, -20) or origSize
-            tw(Main, {Size = newSize}, 0.2, Enum.EasingStyle.Quart)
-            task.delay(0.1, function()
-                Content.Visible = true
-                Sidebar.Visible = true
-            end)
-        end
-    end)
-
-    BtnMax.MouseButton1Click:Connect(function()
-        if minimized then return end
-        maximized = not maximized
-        if maximized then
-            origSize = Main.Size
-            origPos = Main.Position
+            Content.Visible = true
+            Sidebar.Visible = true
             tw(Main, {Size = UDim2.new(1, -20, 1, -20), Position = UDim2.new(0.5, 0, 0.5, 0)}, 0.2, Enum.EasingStyle.Quart)
-            BtnMax.Text = "❐"
-        else
-            tw(Main, {Size = origSize, Position = origPos}, 0.2, Enum.EasingStyle.Quart)
-            BtnMax.Text = "❐"
+            BtnMin.Text = "❐"
         end
     end)
 
