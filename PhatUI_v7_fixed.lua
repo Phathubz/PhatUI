@@ -293,8 +293,8 @@ function Phat:CreateWindow(cfg)
         local btn = Instance.new("TextButton")
         btn.Size = UDim2.fromOffset(26, 26)
 
-        btn.AnchorPoint = Vector2.new(0, 0.5) -- 🔥 bám trái
-        btn.Position = UDim2.new(0, xOff, 0.5, 0)
+        btn.AnchorPoint = Vector2.new(1, 0.5) -- 🔥 bám phải
+        btn.Position = UDim2.new(1, xOff, 0.5, 0)
 
         btn.Text = txt
         btn.TextSize = 12
@@ -317,9 +317,9 @@ function Phat:CreateWindow(cfg)
 
         return btn
     end
-    local BtnMin   = makeBtn(12, "─", C.ELEM, C.ELEMH, C.T3)
-    local BtnMax   = makeBtn(44, "□", C.ELEM, C.ELEMH, C.T3)
-    local BtnClose = makeBtn(76, "X", Color3.fromRGB(45,12,12), C.RED, C.RED)
+    local BtnClose = makeBtn(-12, "X", Color3.fromRGB(45,12,12), C.RED, C.RED)
+    local BtnMax   = makeBtn(-44, "□", C.ELEM, C.ELEMH, C.T3)
+    local BtnMin   = makeBtn(-76, "─", C.ELEM, C.ELEMH, C.T3)
     local drag = {active = false, startPos = nil, startMainPos = nil}
     TopBar.InputBegan:Connect(function(i)
         if i.UserInputType == Enum.UserInputType.MouseButton1 then
