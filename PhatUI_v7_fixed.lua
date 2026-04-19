@@ -293,7 +293,8 @@ function Phat:CreateWindow(cfg)
     local function makeBtn(xOff, txt, nc, hc, tc)
         local btn = Instance.new("TextButton")
         btn.Size = UDim2.fromOffset(26, 26)
-        btn.Position = UDim2.new(0, xOff, 0.5, -13)
+        btn.AnchorPoint = Vector2.new(0.5, 0.5) -- 🔥 quan trọng
+        btn.Position = UDim2.new(0.5, xOff, 0.5, 0)
         btn.Text = txt
         btn.TextSize = 12
         btn.Font = Enum.Font.GothamBold
@@ -314,9 +315,9 @@ function Phat:CreateWindow(cfg)
         return btn
     end
 
-    local BtnMin = makeBtn(12, "─", C.ELEM, C.ELEMH, C.T3)
-    local BtnMax = makeBtn(42, "□", C.ELEM, C.ELEMH, C.T3)
-    local BtnClose = makeBtn(72, "X", Color3.fromRGB(45, 12, 12), C.RED, C.RED)
+    local BtnMin   = makeBtn(-30, "─", C.ELEM, C.ELEMH, C.T3)
+    local BtnMax   = makeBtn(0,   "□", C.ELEM, C.ELEMH, C.T3)
+    local BtnClose = makeBtn(30,  "X", Color3.fromRGB(45,12,12), C.RED, C.RED)
 
     local drag = {active = false, startPos = nil, startMainPos = nil}
     TopBar.InputBegan:Connect(function(i)
