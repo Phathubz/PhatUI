@@ -1425,6 +1425,12 @@ function Phat:CreateWindow(cfg)
     end)
 
     BtnClose.MouseButton1Click:Connect(function()
+        local env = getgenv or function() return {} end
+        for k in next, env() do
+            if type(env()[k]) ~= "function" and k ~= "script" and k ~= "game" then
+                env()[k] = nil
+            end
+        end
         tw(Main, {Size = UDim2.new(0, W, 0, 0), BackgroundTransparency = 1}, 0.18, Enum.EasingStyle.Quart)
         task.delay(0.2, function()
             sg:Destroy()
